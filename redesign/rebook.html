@@ -1,0 +1,643 @@
+<title>Rebook in Two Taps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+
+<style>
+:root{
+  --paper:#F6F4EF;
+  --card:#FFFFFF;
+  --raise:#FAF8F3;
+  --ink:#191612;
+  --ink-soft:#4C463D;
+  --muted:#8B8375;
+  --hair:#E6E1D6;
+  --hair-strong:#D5CEC0;
+  --accent:#2B4BF2;
+  --accent-ink:#FFFFFF;
+  --accent-wash:#E9EDFF;
+  --accent-edge:#C3CDFF;
+  --good:#1C7F4D;
+  --good-wash:#E2F1E9;
+  --warm:#B4541F;
+  --ground:#EDE9E0;
+  --shadow:0 1px 2px rgba(31,26,18,.05), 0 6px 18px -8px rgba(31,26,18,.13);
+  --shadow-lift:0 2px 6px rgba(31,26,18,.07), 0 20px 46px -18px rgba(31,26,18,.30);
+  --sheet-shadow:0 -8px 60px -12px rgba(31,26,18,.32);
+  --taps-bg:rgba(255,255,255,.18);
+  --focus:#2B4BF2;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#16150F;
+    --card:#221F19;
+    --raise:#2B2721;
+    --ink:#F4F0E7;
+    --ink-soft:#C3BBAC;
+    --muted:#8E8779;
+    --hair:#332F27;
+    --hair-strong:#443F35;
+    --accent:#8398FF;
+    --accent-ink:#0E1330;
+    --accent-wash:#242747;
+    --accent-edge:#3C4270;
+    --good:#66D79B;
+    --good-wash:#18301F;
+    --warm:#E4A276;
+    --ground:#0E0D09;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 6px 18px -8px rgba(0,0,0,.6);
+    --shadow-lift:0 2px 6px rgba(0,0,0,.5), 0 20px 46px -18px rgba(0,0,0,.8);
+    --sheet-shadow:0 -8px 60px -12px rgba(0,0,0,.7);
+    --taps-bg:rgba(0,0,0,.18);
+    --focus:#8398FF;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#16150F;
+  --card:#221F19;
+  --raise:#2B2721;
+  --ink:#F4F0E7;
+  --ink-soft:#C3BBAC;
+  --muted:#8E8779;
+  --hair:#332F27;
+  --hair-strong:#443F35;
+  --accent:#8398FF;
+  --accent-ink:#0E1330;
+  --accent-wash:#242747;
+  --accent-edge:#3C4270;
+  --good:#66D79B;
+  --good-wash:#18301F;
+  --warm:#E4A276;
+  --ground:#0E0D09;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 6px 18px -8px rgba(0,0,0,.6);
+  --shadow-lift:0 2px 6px rgba(0,0,0,.5), 0 20px 46px -18px rgba(0,0,0,.8);
+  --sheet-shadow:0 -8px 60px -12px rgba(0,0,0,.7);
+  --taps-bg:rgba(0,0,0,.18);
+  --focus:#8398FF;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"Geist","Helvetica Neue",Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;text-align:left}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
+
+/* ---- the app IS the page: full-bleed on a phone, framed on a desktop ---- */
+.app{
+  position:relative;
+  width:100%;
+  max-width:448px;
+  margin:0 auto;
+  min-height:100dvh;
+  background:var(--paper);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+@media (min-width:540px){
+  .app{
+    min-height:0;
+    height:min(884px, calc(100dvh - 48px));
+    margin:24px auto;
+    border-radius:30px;
+    box-shadow:var(--shadow-lift);
+    border:1px solid var(--hair);
+  }
+}
+
+/* ---- top bar ---- */
+.top{
+  flex:0 0 auto;
+  padding:20px 20px 12px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+}
+.eyebrow{
+  font-family:"Geist Mono",ui-monospace,monospace;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 6px;
+}
+.hello{
+  font-family:"Bricolage Grotesque","Geist",sans-serif;
+  font-weight:600;font-size:27px;line-height:1.05;letter-spacing:-.024em;
+  margin:0 0 7px;
+}
+.place{display:flex;align-items:center;gap:5px;font-size:12.5px;color:var(--ink-soft);margin:0}
+.pin{width:11px;height:11px;flex:0 0 auto;fill:var(--muted)}
+.topright{display:flex;align-items:center;gap:8px;flex:0 0 auto;padding-top:3px}
+.iconbtn{
+  width:36px;height:36px;border-radius:50%;
+  display:grid;place-items:center;
+  border:1px solid var(--hair-strong);background:var(--card);
+  font-size:14px;line-height:1;
+  transition:transform .12s ease, background .15s ease;
+}
+.iconbtn:hover{background:var(--raise)}
+.iconbtn:active{transform:scale(.94)}
+.me{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--accent-wash);color:var(--accent);
+  display:grid;place-items:center;font-weight:600;font-size:13px;
+  border:1px solid var(--accent-edge);
+}
+
+/* ---- scrolling feed ---- */
+.feed{
+  flex:1 1 auto;min-height:0;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:18px;
+  scrollbar-width:none;
+}
+.feed::-webkit-scrollbar{display:none}
+.sec{padding:0 20px}
+.sechead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:26px 0 11px}
+.sectitle{
+  font-family:"Geist Mono",ui-monospace,monospace;
+  font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--muted);margin:0;
+}
+.seclink{font-size:12.5px;font-weight:500;color:var(--accent)}
+
+/* ---- hero: your usual ---- */
+.usual{
+  background:var(--card);border:1px solid var(--hair);
+  border-radius:20px;box-shadow:var(--shadow);
+}
+.usual-top{display:flex;gap:13px;padding:16px 16px 0;align-items:flex-start}
+.face{
+  width:54px;height:54px;border-radius:15px;flex:0 0 auto;
+  border:1px solid var(--hair);background:var(--ground);object-fit:cover;
+}
+.who{flex:1 1 auto;min-width:0}
+.whorow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.name{
+  font-family:"Bricolage Grotesque","Geist",sans-serif;
+  font-weight:600;font-size:19px;letter-spacing:-.018em;margin:0;line-height:1.15;
+}
+.pill{
+  font-family:"Geist Mono",ui-monospace,monospace;
+  font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+  padding:3px 7px;border-radius:5px;white-space:nowrap;
+  background:var(--accent-wash);color:var(--accent);border:1px solid var(--accent-edge);
+}
+.meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft);margin:5px 0 0}
+.star{color:var(--warm);font-size:11px}
+.num{font-family:"Geist Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;font-weight:500}
+.dot{color:var(--hair-strong)}
+
+.svc{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  margin:14px 16px 0;padding-top:13px;border-top:1px solid var(--hair);
+}
+.svc-name{font-size:14.5px;font-weight:500;line-height:1.4}
+.svc-dur{color:var(--muted);font-weight:400}
+.price{
+  font-family:"Geist Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;
+  font-size:17px;font-weight:500;white-space:nowrap;
+}
+
+.live{display:flex;gap:9px;align-items:flex-start;margin:13px 16px 0;padding:10px 12px;background:var(--good-wash);border-radius:12px}
+.beacon{position:relative;width:8px;height:8px;flex:0 0 auto;margin-top:4px}
+.beacon i{position:absolute;inset:0;border-radius:50%;background:var(--good);display:block}
+.beacon i::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1.5px solid var(--good);opacity:.55;animation:ping 2s cubic-bezier(.2,.7,.4,1) infinite}
+@keyframes ping{0%{transform:scale(.55);opacity:.6}70%,100%{transform:scale(1.5);opacity:0}}
+.livetext{font-size:12.5px;line-height:1.5;color:var(--ink-soft);margin:0}
+.livetext b{color:var(--ink);font-weight:600}
+
+.cta{
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  min-height:52px;padding:0 18px;
+  background:var(--accent);color:var(--accent-ink);border-radius:14px;
+  font-size:15.5px;font-weight:600;letter-spacing:-.01em;
+  transition:transform .12s ease, filter .15s ease;
+}
+.cta:hover{filter:brightness(1.06)}
+.cta:active{transform:scale(.985)}
+.usual .cta{width:calc(100% - 32px);margin:14px 16px 16px}
+.taps{
+  font-family:"Geist Mono",ui-monospace,monospace;
+  font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+  padding:3px 7px;border-radius:5px;background:var(--taps-bg);
+}
+
+/* ---- switch it up ---- */
+.rail{
+  display:flex;gap:11px;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+  padding:3px 20px 6px;margin:0 -20px;
+  scrollbar-width:none;
+}
+.rail::-webkit-scrollbar{display:none}
+.bcard{
+  flex:0 0 152px;scroll-snap-align:start;
+  background:var(--card);border:1px solid var(--hair);
+  border-radius:16px;box-shadow:var(--shadow);overflow:hidden;
+  display:block;padding:0;transition:transform .14s ease;
+}
+.bcard:active{transform:scale(.975)}
+.bcard img{width:100%;height:104px;display:block;object-fit:cover;background:var(--ground)}
+.bbody{display:block;padding:10px 11px 11px}
+.bname{display:block;font-size:13.5px;font-weight:600;letter-spacing:-.01em;line-height:1.2}
+.brole{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.3}
+.bfoot{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  margin-top:9px;padding-top:8px;border-top:1px solid var(--hair);
+  font-size:11px;color:var(--ink-soft);
+}
+.bfree{color:var(--good);font-weight:500;white-space:nowrap}
+
+/* ---- last visit ---- */
+.last{
+  display:flex;align-items:center;gap:12px;width:100%;
+  background:var(--card);border:1px solid var(--hair);
+  border-radius:14px;padding:12px 14px;box-shadow:var(--shadow);
+}
+.last img{width:38px;height:38px;border-radius:10px;flex:0 0 auto;border:1px solid var(--hair)}
+.lasttext{flex:1 1 auto;min-width:0}
+.lasttitle{display:block;font-size:13.5px;font-weight:500}
+.lastsub{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.chev{color:var(--muted);font-size:17px;flex:0 0 auto}
+
+/* ---- tab bar ---- */
+.tabs{
+  flex:0 0 auto;display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--hair);background:var(--card);
+  padding:7px 6px calc(7px + env(safe-area-inset-bottom));
+}
+.tab{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:6px 2px;border-radius:10px;
+  font-size:10px;font-weight:500;color:var(--muted);text-align:center;
+}
+.tab svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.tab[aria-current="page"]{color:var(--accent)}
+
+/* ---- sheet ---- */
+.scrim{
+  position:absolute;inset:0;z-index:20;
+  background:rgba(20,17,12,.42);
+  opacity:0;pointer-events:none;transition:opacity .26s ease;
+}
+.scrim.show{opacity:1;pointer-events:auto}
+.sheet{
+  position:absolute;left:0;right:0;bottom:0;z-index:30;
+  background:var(--card);border-radius:24px 24px 0 0;
+  box-shadow:var(--sheet-shadow);
+  transform:translateY(102%);
+  transition:transform .34s cubic-bezier(.32,.72,.2,1);
+  max-height:94%;display:flex;flex-direction:column;
+}
+.sheet.show{transform:translateY(0)}
+.grip{width:36px;height:4px;border-radius:99px;background:var(--hair-strong);margin:9px auto 0;flex:0 0 auto}
+.sheetscroll{overflow-y:auto;padding:14px 20px calc(20px + env(safe-area-inset-bottom));scrollbar-width:none}
+.sheetscroll::-webkit-scrollbar{display:none}
+.sheettitle{
+  font-family:"Bricolage Grotesque","Geist",sans-serif;
+  font-weight:600;font-size:21px;letter-spacing:-.022em;margin:0 0 4px;
+}
+.sheetsub{font-size:12.5px;color:var(--muted);margin:0 0 16px}
+
+.confirm{border:1px solid var(--hair);border-radius:14px}
+.crow{display:flex;align-items:center;gap:11px;padding:12px 13px}
+.crow + .crow{border-top:1px solid var(--hair)}
+.clabel{
+  font-family:"Geist Mono",ui-monospace,monospace;
+  font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  width:52px;flex:0 0 auto;
+}
+.cval{flex:1 1 auto;min-width:0;font-size:13.5px;font-weight:500;line-height:1.35}
+.cval small{display:block;font-size:11.5px;font-weight:400;color:var(--muted);margin-top:2px}
+.change{font-size:12px;font-weight:500;color:var(--accent);flex:0 0 auto;padding:6px 9px;border-radius:8px}
+.change:hover{background:var(--accent-wash)}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding:3px 20px 3px;margin:11px -20px 0;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;min-width:62px;text-align:center;
+  font-family:"Geist Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;
+  font-size:13.5px;font-weight:500;
+  padding:9px 12px;border-radius:11px;
+  border:1px solid var(--hair-strong);background:var(--card);color:var(--ink-soft);
+  transition:transform .12s ease;
+}
+.chip:active{transform:scale(.95)}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.chip .tag{display:block;font-size:8.5px;letter-spacing:.07em;opacity:.72;margin-top:3px;text-transform:uppercase}
+
+.total{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid var(--hair)}
+.totlab{font-size:12.5px;color:var(--muted)}
+.totval{font-family:"Geist Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:19px;font-weight:500}
+.hold{display:flex;gap:8px;align-items:flex-start;margin:12px 0 0;font-size:11.5px;line-height:1.5;color:var(--muted)}
+.hold svg{width:13px;height:13px;flex:0 0 auto;margin-top:2px;stroke:var(--good);fill:none;stroke-width:1.8}
+.sheet .cta{width:100%;margin-top:18px}
+
+/* ---- success ---- */
+.success{
+  position:absolute;inset:0;z-index:40;background:var(--paper);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 26px;text-align:center;
+  opacity:0;pointer-events:none;transition:opacity .3s ease;
+}
+.success.show{opacity:1;pointer-events:auto}
+.check{width:64px;height:64px;margin-bottom:20px}
+.check circle{fill:var(--good-wash);stroke:var(--good);stroke-width:1.5}
+.check path{fill:none;stroke:var(--good);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:32;stroke-dashoffset:32}
+.success.show .check{animation:pop .5s cubic-bezier(.2,1.5,.5,1) both}
+.success.show .check path{animation:draw .45s .22s ease forwards}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes draw{to{stroke-dashoffset:0}}
+.stitle{
+  font-family:"Bricolage Grotesque","Geist",sans-serif;
+  font-weight:600;font-size:25px;letter-spacing:-.026em;margin:0 0 7px;
+}
+.ssub{font-size:13.5px;color:var(--ink-soft);margin:0 0 22px;line-height:1.5}
+.ticket{
+  width:100%;max-width:330px;background:var(--card);
+  border:1px solid var(--hair);border-radius:16px;box-shadow:var(--shadow);
+}
+.trow{display:flex;align-items:center;gap:11px;padding:12px 14px}
+.trow + .trow{border-top:1px dashed var(--hair-strong)}
+.tlabel{
+  font-family:"Geist Mono",ui-monospace,monospace;
+  font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  width:48px;flex:0 0 auto;
+}
+.tval{font-size:13.5px;font-weight:500;flex:1 1 auto}
+.tval em{font-style:normal;color:var(--muted);font-weight:400}
+.walk{display:flex;align-items:center;justify-content:center;gap:6px;margin:14px 0 0;font-size:12px;color:var(--muted)}
+.done{
+  margin-top:26px;min-height:46px;padding:0 26px;text-align:center;
+  border-radius:12px;border:1px solid var(--hair-strong);
+  background:var(--card);font-size:14px;font-weight:500;
+}
+.done:hover{background:var(--raise)}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+}
+</style>
+
+<div class="app">
+
+  <header class="top">
+    <div>
+      <p class="eyebrow">Friday, 5 Sept</p>
+      <h1 class="hello">Evening, Aarav</h1>
+      <p class="place">
+        <svg class="pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-5.6 8-12a8 8 0 1 0-16 0c0 6.4 8 12 8 12z"/><circle cx="12" cy="10" r="3" fill="var(--paper)"/></svg>
+        Sohna Road, Gurugram
+      </p>
+    </div>
+    <div class="topright">
+      <button class="iconbtn" id="themeBtn" title="Switch theme" aria-label="Switch theme">&#9682;</button>
+      <div class="me" aria-hidden="true">A</div>
+    </div>
+  </header>
+
+  <main class="feed" id="feed">
+
+    <section class="sec">
+      <div class="sechead"><p class="sectitle">Your usual</p></div>
+
+      <div class="usual">
+        <div class="usual-top">
+          <img class="face" id="faceRohan" alt="Rohan Mehra">
+          <div class="who">
+            <div class="whorow">
+              <h2 class="name">Rohan Mehra</h2>
+              <span class="pill">Regular</span>
+            </div>
+            <p class="meta">
+              <span class="star">&#9733;</span><span class="num">4.9</span>
+              <span class="dot">&middot;</span>
+              <span>Your last <span class="num">6</span> cuts</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="svc">
+          <div class="svc-name">Skin Fade + Beard Sculpt<br><span class="svc-dur">45 min</span></div>
+          <div class="price">&#8377;530</div>
+        </div>
+
+        <div class="live">
+          <span class="beacon" aria-hidden="true"><i></i></span>
+          <p class="livetext">Next free chair with Rohan is <b>today, 6:30&nbsp;PM</b>. It has been <b>17 days</b> since your last fade.</p>
+        </div>
+
+        <button class="cta" id="openSheet">
+          Rebook the usual
+          <span class="taps">2 taps</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="sechead">
+        <p class="sectitle">Switch it up</p>
+        <span class="seclink">See all 12</span>
+      </div>
+      <div class="rail" id="rail"></div>
+    </section>
+
+    <section class="sec">
+      <div class="sechead"><p class="sectitle">Last visit</p></div>
+      <button class="last">
+        <img id="faceLast" alt="">
+        <span class="lasttext">
+          <span class="lasttitle">Skin Fade + Beard Sculpt</span>
+          <span class="lastsub">19 Aug &middot; Rohan &middot; &#8377;530 &middot; you tipped &#8377;50</span>
+        </span>
+        <span class="chev" aria-hidden="true">&rsaquo;</span>
+      </button>
+    </section>
+
+  </main>
+
+  <nav class="tabs">
+    <button class="tab" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+      Home
+    </button>
+    <button class="tab">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      Explore
+    </button>
+    <button class="tab">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>
+      Bookings
+    </button>
+    <button class="tab">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-4 3.9-6 7.5-6s6.7 2 7.5 6"/></svg>
+      You
+    </button>
+  </nav>
+
+  <div class="scrim" id="scrim"></div>
+
+  <section class="sheet" id="sheet" aria-label="Confirm your booking">
+    <div class="grip"></div>
+    <div class="sheetscroll">
+      <h2 class="sheettitle">Confirm your usual</h2>
+      <p class="sheetsub">Already filled in. Just pick a time.</p>
+
+      <div class="confirm">
+        <div class="crow">
+          <span class="clabel">Barber</span>
+          <span class="cval">Rohan Mehra<small>The Crown Salon &middot; Sohna Road</small></span>
+          <button class="change">Change</button>
+        </div>
+        <div class="crow">
+          <span class="clabel">Service</span>
+          <span class="cval">Skin Fade + Beard Sculpt<small>45 min</small></span>
+          <button class="change">Change</button>
+        </div>
+      </div>
+
+      <div class="sechead" style="margin:20px 0 0"><p class="sectitle">Today</p></div>
+      <div class="chips" id="chips"></div>
+
+      <div class="total">
+        <span class="totlab">Total, pay at the chair</span>
+        <span class="totval">&#8377;530</span>
+      </div>
+
+      <p class="hold">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.2 2"/></svg>
+        We hold your chair for 10 minutes after your slot, and nudge you 30 minutes before. No waiting around.
+      </p>
+
+      <button class="cta" id="confirmBtn">Confirm booking</button>
+    </div>
+  </section>
+
+  <div class="success" id="success">
+    <svg class="check" viewBox="0 0 52 52" aria-hidden="true">
+      <circle cx="26" cy="26" r="24"/>
+      <path d="M15 27l7.5 7.5L37.5 19"/>
+    </svg>
+    <h2 class="stitle">You are booked, Aarav</h2>
+    <p class="ssub">Rohan has your chair. Two taps, done.</p>
+
+    <div class="ticket">
+      <div class="trow"><span class="tlabel">Who</span><span class="tval">Rohan Mehra <em>&middot; your regular</em></span></div>
+      <div class="trow"><span class="tlabel">What</span><span class="tval">Skin Fade + Beard Sculpt <em>&middot; 45 min</em></span></div>
+      <div class="trow"><span class="tlabel">When</span><span class="tval" id="ticketTime">Today, 6:30 PM</span></div>
+    </div>
+
+    <p class="walk">The Crown Salon &middot; 400&nbsp;m &middot; 6 min walk</p>
+    <button class="done" id="doneBtn">Back to home</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* deterministic portrait tiles, so the page carries no external images */
+  function portrait(seed, initial, size){
+    var h = 0, i;
+    for (i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) % 360;
+    var a = h, b = (h + 42) % 360;
+    var svg =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 100 100">' +
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop offset="0" stop-color="hsl(' + a + ',44%,60%)"/>' +
+      '<stop offset="1" stop-color="hsl(' + b + ',50%,40%)"/>' +
+      '</linearGradient></defs>' +
+      '<rect width="100" height="100" fill="url(#g)"/>' +
+      '<circle cx="50" cy="40" r="16" fill="rgba(255,255,255,.30)"/>' +
+      '<path d="M18 100c4-19 16-28 32-28s28 9 32 28z" fill="rgba(255,255,255,.30)"/>' +
+      '<text x="50" y="57" font-family="Helvetica,Arial,sans-serif" font-size="28" font-weight="700" ' +
+      'fill="rgba(255,255,255,.96)" text-anchor="middle">' + initial + '</text>' +
+      '</svg>';
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  }
+
+  document.getElementById('faceRohan').src = portrait('rohan-mehra', 'R', 120);
+  document.getElementById('faceLast').src  = portrait('rohan-mehra', 'R', 80);
+
+  var barbers = [
+    { name:'Salman K.', role:'Beard specialist', rating:'4.8', free:'Free 7:15' },
+    { name:'Vikram R.', role:'Classic cuts',     rating:'4.7', free:'Free 6:00' },
+    { name:'Imran S.',  role:'Scalp &amp; spa',  rating:'4.9', free:'Free 8:00' },
+    { name:'Dev A.',    role:'Fades &amp; tapers', rating:'4.6', free:'Free now' }
+  ];
+  document.getElementById('rail').innerHTML = barbers.map(function(b){
+    return '<button class="bcard">' +
+      '<img src="' + portrait(b.name, b.name.charAt(0), 300) + '" alt="">' +
+      '<span class="bbody">' +
+        '<span class="bname">' + b.name + '</span>' +
+        '<span class="brole">' + b.role + '</span>' +
+        '<span class="bfoot">' +
+          '<span><span class="star">&#9733;</span> <span class="num">' + b.rating + '</span></span>' +
+          '<span class="bfree">' + b.free + '</span>' +
+        '</span>' +
+      '</span>' +
+    '</button>';
+  }).join('');
+
+  var slots = [
+    { t:'5:45', tag:'pm' },
+    { t:'6:00', tag:'pm' },
+    { t:'6:30', tag:'usual' },
+    { t:'7:00', tag:'pm' },
+    { t:'7:30', tag:'pm' },
+    { t:'8:15', tag:'pm' }
+  ];
+  var picked = '6:30';
+  var chips = document.getElementById('chips');
+  chips.innerHTML = slots.map(function(s){
+    return '<button class="chip" data-t="' + s.t + '" aria-pressed="' + (s.t === picked) + '">' +
+      s.t + '<span class="tag">' + s.tag + '</span></button>';
+  }).join('');
+  chips.addEventListener('click', function(e){
+    var btn = e.target.closest('.chip');
+    if (!btn) return;
+    picked = btn.getAttribute('data-t');
+    Array.prototype.forEach.call(chips.children, function(c){
+      c.setAttribute('aria-pressed', String(c === btn));
+    });
+  });
+
+  var sheet   = document.getElementById('sheet');
+  var scrim   = document.getElementById('scrim');
+  var success = document.getElementById('success');
+
+  function openSheet(){ sheet.classList.add('show'); scrim.classList.add('show'); }
+  function closeSheet(){ sheet.classList.remove('show'); scrim.classList.remove('show'); }
+
+  document.getElementById('openSheet').addEventListener('click', openSheet);
+  scrim.addEventListener('click', closeSheet);
+
+  document.getElementById('confirmBtn').addEventListener('click', function(){
+    document.getElementById('ticketTime').textContent = 'Today, ' + picked + ' PM';
+    closeSheet();
+    setTimeout(function(){ success.classList.add('show'); }, 240);
+  });
+
+  document.getElementById('doneBtn').addEventListener('click', function(){
+    success.classList.remove('show');
+    document.getElementById('feed').scrollTop = 0;
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') closeSheet();
+  });
+
+  var order = [null, 'light', 'dark'], at = 0;
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    at = (at + 1) % order.length;
+    if (order[at]) document.documentElement.setAttribute('data-theme', order[at]);
+    else document.documentElement.removeAttribute('data-theme');
+  });
+})();
+</script>
