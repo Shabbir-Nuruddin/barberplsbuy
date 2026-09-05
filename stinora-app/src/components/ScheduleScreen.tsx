@@ -30,52 +30,52 @@ export default function ScheduleScreen({
   if (!barber) return null;
 
   return (
-    <div className="flex-1 flex flex-col bg-zinc-950 overflow-hidden relative">
+    <div className="flex-1 flex flex-col bg-earth-50 overflow-hidden relative">
       
-      <header className="px-6 py-5 flex items-center gap-4 border-b border-zinc-800/50 bg-zinc-900/50 backdrop-blur-xl shrink-0 z-10">
+      <header className="px-6 py-5 flex items-center gap-4 bg-earth-50 shrink-0 z-10 border-b border-earth-200/50">
         <button 
           onClick={back}
-          className="w-10 h-10 rounded-full border border-zinc-700 bg-zinc-800 flex items-center justify-center text-zinc-100 active:scale-95 transition-transform"
+          className="w-10 h-10 rounded-full bg-white shadow-sm border border-earth-200 flex items-center justify-center text-earth-800 active:scale-95 transition-transform"
         >
           <ArrowLeft size={18} />
         </button>
-        <h2 className="font-sans font-semibold text-lg tracking-tight text-white">Schedule</h2>
+        <h2 className="font-sans font-bold text-lg tracking-tight text-earth-900">Schedule</h2>
       </header>
 
       {/* Mini Profile */}
-      <div className="px-6 py-4 flex items-center gap-4 bg-zinc-900 border-b border-zinc-800 shrink-0">
+      <div className="px-6 py-4 flex items-center gap-4 bg-white shadow-sm shrink-0">
         <img 
           src={getAvatar(barber.name.toLowerCase().replace(' ', '-'), barber.name[0], 80)} 
           alt={barber.name} 
-          className="w-12 h-12 rounded-full"
+          className="w-12 h-12 rounded-full border border-earth-100"
         />
         <div>
-          <h3 className="font-semibold text-sm text-white">{barber.name}</h3>
-          <p className="text-xs text-brand-500">{barber.spec}</p>
+          <h3 className="font-bold text-sm text-earth-900">{barber.name}</h3>
+          <p className="text-xs font-semibold text-earth-500">{barber.spec}</p>
         </div>
       </div>
 
       <motion.div variants={container} initial="hidden" animate="show" className="flex-1 overflow-y-auto no-scrollbar pb-28">
         
         {/* Date Rail */}
-        <motion.div variants={item} className="mt-6 mb-8">
-          <div className="px-6 mb-3">
-            <h2 className="font-mono text-[10px] tracking-widest uppercase text-zinc-500">Pick a Date</h2>
+        <motion.div variants={item} className="mt-8 mb-8">
+          <div className="px-6 mb-4">
+            <h2 className="font-sans font-bold text-lg text-earth-900">Pick a Date</h2>
           </div>
-          <div className="flex gap-3 overflow-x-auto no-scrollbar px-6 pb-2 -mx-6">
+          <div className="flex gap-3 overflow-x-auto no-scrollbar px-6 pb-2 -mx-6 snap-x snap-mandatory">
             {MOCK_DATA.dates.map((d, i) => {
               const active = i === 0;
               return (
                 <button 
                   key={i}
-                  className={`flex-none w-[72px] h-[80px] rounded-[1.25rem] flex flex-col items-center justify-center gap-1 border transition-all ${
+                  className={`snap-start flex-none w-[76px] h-[86px] rounded-[1.25rem] flex flex-col items-center justify-center gap-1 border transition-all active:scale-[0.98] ${
                     active 
-                      ? 'bg-brand-500 border-brand-500 text-brand-950 shadow-[0_4px_12px_rgba(212,175,55,0.2)]' 
-                      : 'bg-zinc-900 border-zinc-800 text-zinc-400 active:scale-95'
+                      ? 'bg-earth-900 border-earth-900 text-white shadow-diffusion' 
+                      : 'bg-white border-earth-200 text-earth-600 shadow-sm'
                   }`}
                 >
-                  <span className={`font-mono text-xs uppercase tracking-widest ${active ? 'opacity-80' : ''}`}>{d.day}</span>
-                  <span className={`font-sans font-bold text-xl ${active ? '' : 'text-zinc-100'}`}>{d.num}</span>
+                  <span className={`font-mono text-[11px] uppercase tracking-widest font-semibold ${active ? 'opacity-80' : ''}`}>{d.day}</span>
+                  <span className={`font-sans font-bold text-2xl ${active ? '' : 'text-earth-900'}`}>{d.num}</span>
                 </button>
               )
             })}
@@ -83,9 +83,9 @@ export default function ScheduleScreen({
         </motion.div>
 
         {/* Time Slots */}
-        <motion.div variants={item} className="px-6 mb-8">
-          <div className="mb-3">
-            <h2 className="font-mono text-[10px] tracking-widest uppercase text-zinc-500">Select Time Slot</h2>
+        <motion.div variants={item} className="px-6 mb-10">
+          <div className="mb-4">
+            <h2 className="font-sans font-bold text-lg text-earth-900">Select Time Slot</h2>
           </div>
           <div className="grid grid-cols-3 gap-3">
             {MOCK_DATA.slots.map(t => {
@@ -96,12 +96,12 @@ export default function ScheduleScreen({
                   key={t}
                   disabled={booked}
                   onClick={() => setSelectedTime(t)}
-                  className={`py-3 rounded-xl font-mono text-sm font-medium transition-all ${
+                  className={`py-3.5 rounded-xl font-mono text-sm font-semibold transition-all shadow-sm ${
                     booked 
-                      ? 'opacity-40 bg-zinc-900 border border-zinc-800 line-through cursor-not-allowed'
+                      ? 'opacity-40 bg-earth-100 border-earth-200 line-through cursor-not-allowed text-earth-400'
                       : selected 
-                        ? 'bg-brand-500/20 border border-brand-500/50 text-brand-500'
-                        : 'bg-zinc-900 border border-zinc-800 text-zinc-200 active:scale-95'
+                        ? 'bg-earth-900 border-earth-900 text-white shadow-diffusion'
+                        : 'bg-white border border-earth-200 text-earth-800 active:scale-95 hover:border-earth-300'
                   }`}
                 >
                   {t}
@@ -112,9 +112,9 @@ export default function ScheduleScreen({
         </motion.div>
 
         {/* Services */}
-        <motion.div variants={item} className="px-6">
-          <div className="mb-3">
-            <h2 className="font-mono text-[10px] tracking-widest uppercase text-zinc-500">Select Services</h2>
+        <motion.div variants={item} className="px-6 mb-8">
+          <div className="mb-4">
+            <h2 className="font-sans font-bold text-lg text-earth-900">Select Services</h2>
           </div>
           <div className="flex flex-col gap-3">
             {MOCK_DATA.services.map(srv => {
@@ -123,14 +123,14 @@ export default function ScheduleScreen({
                 <button 
                   key={srv.id}
                   onClick={() => toggleService(srv.id)}
-                  className={`flex justify-between items-center p-4 rounded-2xl border transition-all ${
+                  className={`flex justify-between items-center p-5 rounded-2xl border transition-all active:scale-[0.98] ${
                     selected
-                      ? 'bg-brand-500/10 border-brand-500/40'
-                      : 'bg-zinc-900 border-zinc-800 active:scale-[0.98]'
+                      ? 'bg-earth-900 border-earth-900 shadow-diffusion'
+                      : 'bg-white border-earth-200 shadow-sm hover:border-earth-300'
                   }`}
                 >
-                  <span className="font-medium text-sm text-zinc-100">{srv.name}</span>
-                  <span className="font-mono text-sm text-brand-500 font-medium">₹{srv.price}</span>
+                  <span className={`font-bold text-sm ${selected ? 'text-white' : 'text-earth-900'}`}>{srv.name}</span>
+                  <span className={`font-mono text-sm font-bold ${selected ? 'text-earth-200' : 'text-earth-600'}`}>₹{srv.price}</span>
                 </button>
               )
             })}
@@ -140,18 +140,18 @@ export default function ScheduleScreen({
       </motion.div>
 
       {/* CTA Footer */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent z-30 pointer-events-none">
+      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-earth-50 via-earth-50/90 to-transparent z-30 pointer-events-none">
         <button 
           onClick={() => nav('billing')}
           disabled={!isReady}
-          className={`w-full font-semibold py-4 rounded-xl transition-all shadow-liquid pointer-events-auto flex items-center justify-center gap-2 ${
+          className={`w-full font-bold py-4 rounded-2xl transition-all pointer-events-auto flex items-center justify-center gap-2 ${
             isReady 
-              ? 'bg-brand-500 text-brand-950 active:scale-[0.98] shadow-[0_4px_20px_rgba(212,175,55,0.3)]' 
-              : 'bg-zinc-800 text-zinc-500 border border-zinc-700 cursor-not-allowed'
+              ? 'bg-earth-900 text-white active:scale-[0.98] shadow-diffusion' 
+              : 'bg-earth-200 text-earth-400 cursor-not-allowed'
           }`}
         >
-          Confirm Time & Service
-          <span className="font-mono text-[10px] tracking-widest uppercase bg-black/20 px-2 py-0.5 rounded ml-2">2/3</span>
+          Confirm Details
+          <span className="font-mono text-[10px] tracking-widest uppercase bg-white/20 px-2 py-0.5 rounded ml-2">2/3</span>
         </button>
       </div>
 
