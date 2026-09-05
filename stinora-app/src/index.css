@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +6,7 @@
 
 @layer base {
   body {
-    @apply bg-earth-100 text-earth-800 font-sans antialiased selection:bg-earth-400/30 selection:text-earth-900 overflow-hidden;
+    @apply bg-dark-900 text-dark-100 font-sans antialiased selection:bg-accent-blue/30 selection:text-white overflow-hidden;
   }
 }
 

@@ -3,42 +3,42 @@
 Welcome! This document provides the necessary context to pick up the development of **StinOra**, a premium salon and barber booking application.
 
 ## 1. Project Overview
-StinOra is a high-end, mobile-first booking experience designed to look and feel like a professional, luxury salon. It eschews generic "AI slop" designs in favor of an "Art Gallery" aesthetic characterized by generous whitespace, clean typography, and tactile physics-based interactions.
+StinOra is a high-end, mobile-first booking experience. We recently transitioned the UI into a **Hybrid Dark-Luxury Vibe**—balancing the high-conversion consumer psychology of top-tier utility apps (like Uber) with the premium typography and physics of luxury branding.
 
 ## 2. Tech Stack
 - **Framework**: React 18 with TypeScript, bundled via Vite.
 - **Styling**: Tailwind CSS v3.
 - **Motion & Physics**: `framer-motion` (used extensively for Spring physics and layout transitions).
-- **Icons**: `@phosphor-icons/react` and `lucide-react`.
+- **Icons**: `lucide-react`.
 
-## 3. Design System & Aesthetics (The "District" Vibe)
-The UI strictly adheres to a "Light Earth" theme inspired by the District app:
-- **Palette**: Creams and warm whites (`#FCFAF8`, `#F5F0E6`) for backgrounds. Deep earthy browns (`#2E2214`, `#4A3720`) for typography. Accents in soft camel/gold.
-- **Shadows**: We use premium `shadow-diffusion` (`0 20px 40px -15px rgba(74, 55, 32, 0.08)`) instead of harsh borders or standard box-shadows.
+## 3. Design System & Aesthetics (Hybrid Dark-Luxury)
+- **Palette**: Warm Espresso/Charcoal base (`#11100E` to `#1A1816`) to maintain organic warmth rather than mechanical `#000000` black. 
+- **Accent Conversion**: We use a vibrant Blurple (`#7E93FF`) for primary CTAs to drive high-contrast consumer conversion.
+- **Shadows**: Premium `shadow-diffusion-dark` (`0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05)`).
 - **Typography**: The `Geist` and `Geist Mono` font pairing.
-- **Physics**: **No linear easing.** Every interaction (buttons, page transitions) uses Framer Motion spring physics (`type: 'spring', stiffness: 300, damping: 24`). Buttons use `active:scale-[0.98]` to provide tactile push feedback.
-- **Orchestration**: Lists (like barbers or salons) use `staggerChildren` to create waterfall reveals.
+- **Physics**: Every interaction (buttons, page transitions) uses Framer Motion spring physics (`type: 'spring', stiffness: 300, damping: 24`). Buttons use `active:scale-[0.98]` to provide tactile push feedback.
+- **Visuals**: CSS linear-gradients used for high-end avatar styling.
 
-## 4. Current Architecture & State
-Currently, the application is a deeply fleshed-out frontend prototype.
-- **Routing**: Handled manually via state (`screen` and `history` arrays) in `src/App.tsx`. There is no `react-router-dom` installed yet.
-- **Global State**: Managed at the top level in `src/App.tsx` and drilled down via props. This includes `searchQuery`, `selectedSalon`, `selectedBarber`, `selectedTime`, and `selectedServices`.
-- **Mock Data**: Hardcoded inside `src/App.tsx` (`MOCK_DATA`).
+## 4. Current Architecture & State (Production Ready)
+- **Routing**: Handled manually via state (`screen`, `history`, and `activeTab` arrays) in `src/App.tsx`.
+- **Navigation**: Features a fixed **Bottom Navigation Bar** (Home, Explore, Bookings, You) for maximal ease-of-use.
+- **Global State**: Managed at the top level in `src/App.tsx`. This includes `selectedSalon`, `selectedBarber`, `selectedDate`, `selectedTime`, and `selectedServices`.
+- **Data Layer (`MOCK_DATA`)**: Contains 20 real premium salons in Bangalore (e.g., Lakme, BBlunt) with accurate local addresses and real market pricing tiers. Also includes a 10-stylist global barber pool.
 
 ## 5. Application Flow (Completed Features)
-1. **WelcomeScreen**: Simulated mobile number login.
-2. **HomeScreen**: Displays "Your Usual" and "Top Rated". Includes a fully functional search bar that filters the salon list.
-3. **UserProfileScreen**: Accessible via the top-right avatar on the Home screen.
-4. **SalonProfileScreen**: Details of the selected salon.
+1. **WelcomeScreen**: Simulated mobile number login with a beautiful dark overlay.
+2. **HomeScreen**: Features a high-utility "Rebook the usual" block with contextual data (Next free chair), and a "Switch it up" horizontal scroll of gradient barber cards.
+3. **UserProfileScreen**: Accessible via the Bottom Nav ("You").
+4. **SalonProfileScreen**: Details of the selected salon with real addresses and dynamic imagery.
 5. **BarberSelectionScreen**: List of barbers with availability indicators.
-6. **ScheduleScreen**: Date, Time Slot, and Service selection.
+6. **ScheduleScreen**: Fully functional state. You can tap through different dates, which accurately updates the UI state and filters available time slots.
 7. **BillingScreen**: Checkout summary with payment method selection, culminating in an animated SVG Success Overlay.
 
 ## 6. Recommended Next Steps (For Claude/Next Dev)
 If you are taking over this codebase, here are the logical next steps:
-1. **Implement Real Routing**: Replace the custom state router in `App.tsx` with `react-router-dom` or migrate the components to a Next.js App Router setup.
-2. **State Management**: Move the drilled props (`selectedSalon`, `searchQuery`) into a proper `Zustand` store or React Context.
-3. **Backend Integration**: Connect the `MOCK_DATA` to a real backend (like Supabase or Firebase) for live booking synchronization.
-4. **Authentication**: Replace the simulated Welcome Screen login with actual Supabase Auth or Firebase Auth (OTP flow).
+1. **Database Migration**: Migrate the 20 real salons and barbers from `MOCK_DATA` directly into Supabase (PostgreSQL) or Firebase Firestore.
+2. **Implement Real Routing**: Replace the custom state router and Bottom Nav logic in `App.tsx` with `react-router-dom` or migrate the components to a Next.js App Router setup.
+3. **State Management**: Move the drilled props into a proper `Zustand` store or React Context.
+4. **Authentication**: Replace the simulated Welcome Screen login with actual Supabase/Firebase Auth (Mobile OTP flow).
 
-*Godspeed and happy coding! Keep the physics springy and the layouts clean.*
+*Godspeed and happy coding! Keep the physics springy and the conversion rates high.*

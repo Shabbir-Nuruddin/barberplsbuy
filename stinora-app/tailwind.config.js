@@ -11,23 +11,29 @@ export default {
         mono: ['Geist Mono', 'monospace'],
       },
       colors: {
-        earth: {
-          50: '#FCFAF8', // Very light cream (App Background)
-          100: '#F5F0E6', // Soft cream (Cards/Surfaces)
-          200: '#E6DCC3',
-          300: '#D4C4A1',
-          400: '#C2AB7F', // Accent Gold/Camel
-          500: '#A68A56',
-          600: '#8C7043',
-          700: '#6B5230',
-          800: '#4A3720', // Main Text
-          900: '#2E2214', // Headings
-          950: '#1C1309',
+        dark: {
+          950: '#0B0A09', // Deepest background
+          900: '#11100E', // Main Background
+          800: '#1A1816', // Cards / Surfaces
+          700: '#23201D', // Hover states
+          600: '#332F2A', // Borders / Dividers
+          500: '#524C44',
+          400: '#7A7266', // Muted Text
+          300: '#A39989',
+          200: '#C2B8A3',
+          100: '#E0D6C1', // Primary Text
+          50: '#F5ECE3',  // Headings
+        },
+        accent: {
+          blue: '#7E93FF', // Blurple CTA
+          green: '#4ADE80', // Success / Availability
+          orange: '#FF8A65', // Gradient element
+          teal: '#2DD4BF', // Gradient element
         }
       },
       boxShadow: {
-        'diffusion': '0 20px 40px -15px rgba(74, 55, 32, 0.08)',
-        'diffusion-sm': '0 4px 12px rgba(74, 55, 32, 0.04)',
+        'diffusion-dark': '0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
+        'diffusion-sm': '0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
       }
     },
   },
