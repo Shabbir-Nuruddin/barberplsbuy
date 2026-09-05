@@ -87,7 +87,7 @@ function App() {
     setSelectedServices([]);
   };
 
-  const variants = {
+  const variants: any = {
     initial: (dir: number) => ({
       x: dir > 0 ? '100%' : '-100%',
       opacity: 0,
