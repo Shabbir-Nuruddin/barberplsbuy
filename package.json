@@ -1,0 +1,19 @@
+{
+  "name": "barberplsbuy",
+  "version": "2.0.0",
+  "private": true,
+  "description": "StinOra — Bespoke Grooming and Salon Studio Appointments",
+  "scripts": {
+    "dev": "npm --prefix stinora-app run dev",
+    "build": "npm --prefix stinora-app run build && cp stinora-app/dist/index.html ./index.html && cp -r stinora-app/dist/assets/* ./assets/ && cp stinora-app/dist/vite.svg ./vite.svg",
+    "preview": "npm --prefix stinora-app run preview"
+  },
+  "keywords": [
+    "salon-booking",
+    "grooming",
+    "stinora",
+    "urban-light"
+  ],
+  "author": "StinOra Engineering",
+  "license": "UNLICENSED"
+}
