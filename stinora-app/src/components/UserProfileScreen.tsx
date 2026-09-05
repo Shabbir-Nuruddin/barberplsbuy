@@ -1,15 +1,20 @@
 import { useState } from 'react';
-import { ArrowLeft, CreditCard, Clock, Settings, LogOut, ChevronRight, ShieldCheck, X, Check } from 'lucide-react';
+import { ArrowLeft, CreditCard, Clock, Settings, LogOut, ChevronRight, ShieldCheck, X, Check, Sun, Moon, Laptop } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import type { ThemeMode } from '../App';
 
 export default function UserProfileScreen({ 
   back, 
   resetHome, 
-  nav 
+  nav,
+  themeMode = 'light',
+  setThemeMode
 }: { 
   back: any, 
   resetHome: any, 
-  nav?: any 
+  nav?: any,
+  themeMode?: ThemeMode,
+  setThemeMode?: (m: ThemeMode) => void
 }) {
   const [activeModal, setActiveModal] = useState<'payments' | 'settings' | 'terms' | null>(null);
 
@@ -41,7 +46,7 @@ export default function UserProfileScreen({
 
       <motion.div variants={container} initial="hidden" animate="show" className="flex-1 overflow-y-auto no-scrollbar pb-28">
         
-        <motion.div variants={item} className="px-6 pt-8 pb-6 text-center flex flex-col items-center">
+        <motion.div variants={item} className="px-6 pt-8 pb-5 text-center flex flex-col items-center">
           <div className="relative mb-4">
             <div className="w-24 h-24 rounded-full border-2 border-brand-500 flex items-center justify-center bg-editorial-800 text-brand-300 font-serif italic text-4xl shadow-glow">
               A
@@ -55,6 +60,62 @@ export default function UserProfileScreen({
           <span className="text-[9px] font-mono uppercase tracking-widest text-brand-300 bg-brand-950/80 border border-brand-800/60 px-2.5 py-0.5 rounded-full font-bold">
             Verified Patron
           </span>
+        </motion.div>
+
+        {/* APPEARANCE / THEME TOGGLE CARD */}
+        <motion.div variants={item} className="px-6 mb-6">
+          <div className="flex items-center justify-between mb-3 px-1">
+            <span className="font-mono text-[10px] tracking-widest uppercase font-bold text-editorial-400">
+              Theme & Palette
+            </span>
+            <span className="text-[10px] font-mono text-brand-400 font-bold uppercase bg-brand-950/40 border border-brand-800/40 px-2 py-0.5 rounded">
+              {themeMode === 'light' ? 'Urban Light' : themeMode === 'dark' ? 'Dark Noir' : 'Device Auto'}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 bg-editorial-800 p-2 rounded-[1rem] border border-editorial-600 shadow-bento">
+            <button
+              type="button"
+              onClick={() => setThemeMode?.('light')}
+              aria-label="Switch to Urban Light mode"
+              className={`py-3 px-2 rounded-lg flex flex-col items-center gap-1.5 transition-all text-xs font-bold ${
+                themeMode === 'light'
+                  ? 'bg-brand-500 text-white shadow-glow'
+                  : 'text-editorial-400 hover:text-editorial-200 hover:bg-editorial-700/50'
+              }`}
+            >
+              <Sun size={18} />
+              <span className="text-[10px] font-semibold">Urban Light</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setThemeMode?.('dark')}
+              aria-label="Switch to Dark Noir mode"
+              className={`py-3 px-2 rounded-lg flex flex-col items-center gap-1.5 transition-all text-xs font-bold ${
+                themeMode === 'dark'
+                  ? 'bg-brand-500 text-white shadow-glow'
+                  : 'text-editorial-400 hover:text-editorial-200 hover:bg-editorial-700/50'
+              }`}
+            >
+              <Moon size={18} />
+              <span className="text-[10px] font-semibold">Dark Noir</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setThemeMode?.('system')}
+              aria-label="Switch to device default theme"
+              className={`py-3 px-2 rounded-lg flex flex-col items-center gap-1.5 transition-all text-xs font-bold ${
+                themeMode === 'system'
+                  ? 'bg-brand-500 text-white shadow-glow'
+                  : 'text-editorial-400 hover:text-editorial-200 hover:bg-editorial-700/50'
+              }`}
+            >
+              <Laptop size={18} />
+              <span className="text-[10px] font-semibold">Device Match</span>
+            </button>
+          </div>
         </motion.div>
 
         <motion.div variants={item} className="px-6 pb-8">

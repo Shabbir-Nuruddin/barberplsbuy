@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -18,7 +19,7 @@ export default {
           200: '#C7CDFF',
           300: '#A4AFFF',
           400: '#7E8BFF',
-          500: '#5452FF', // The signature StinOra Blurple CTA
+          500: '#5452FF', // Signature StinOra Electric Blurple
           600: '#3D38FF',
           700: '#2A24F2',
           800: '#221EC0',
@@ -26,23 +27,23 @@ export default {
           950: '#100E5C',
         },
         editorial: {
-          950: '#070707',
-          900: '#0C0B0A', // Main Background
-          800: '#141311', // Card Background
-          700: '#1C1A18', 
-          600: '#2A2724', // Thin structural borders
-          500: '#4D4742',
-          400: '#736B63',
-          300: '#998E84',
-          200: '#BFB2A6',
-          100: '#E6D7C8', // Secondary Text
-          50: '#F5EBE1',  // Primary Text
+          950: 'rgb(var(--editorial-950) / <alpha-value>)',
+          900: 'rgb(var(--editorial-900) / <alpha-value>)',
+          800: 'rgb(var(--editorial-800) / <alpha-value>)',
+          700: 'rgb(var(--editorial-700) / <alpha-value>)',
+          600: 'rgb(var(--editorial-600) / <alpha-value>)',
+          500: 'rgb(var(--editorial-500) / <alpha-value>)',
+          400: 'rgb(var(--editorial-400) / <alpha-value>)',
+          300: 'rgb(var(--editorial-300) / <alpha-value>)',
+          200: 'rgb(var(--editorial-200) / <alpha-value>)',
+          100: 'rgb(var(--editorial-100) / <alpha-value>)',
+          50: 'rgb(var(--editorial-50) / <alpha-value>)',
         }
       },
       boxShadow: {
-        'bento': 'inset 0 0 0 1px rgba(255, 255, 255, 0.05)',
-        'bento-hover': 'inset 0 0 0 1px rgba(255, 255, 255, 0.15)',
-        'glow': '0 0 40px -10px rgba(84, 82, 255, 0.4)',
+        'bento': 'var(--bento-shadow)',
+        'bento-hover': 'var(--bento-hover-shadow)',
+        'glow': '0 0 40px -10px rgba(84, 82, 255, 0.35)',
       }
     },
   },

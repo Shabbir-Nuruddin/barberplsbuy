@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Home, Search, Calendar, User } from 'lucide-react';
 import WelcomeScreen from './components/WelcomeScreen';
@@ -91,6 +91,8 @@ export function getAvatar(seed: string, initial: string, size: number, colors?: 
   `)}`;
 }
 
+export type ThemeMode = 'light' | 'dark' | 'system';
+
 export interface BookingRecord {
   id: string;
   salonName: string;
@@ -110,6 +112,41 @@ function App() {
   const [history, setHistory] = useState(['welcome']);
   const [direction, setDirection] = useState(1);
   const [activeTab, setActiveTab] = useState('home');
+
+  // Theme Engine (Default: Light Urban Salon Mode)
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    return (localStorage.getItem('stinora_theme') as ThemeMode) || 'light';
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    const applyTheme = () => {
+      if (themeMode === 'dark') {
+        root.classList.add('dark');
+      } else if (themeMode === 'light') {
+        root.classList.remove('dark');
+      } else {
+        // System preference
+        if (mediaQuery.matches) {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
+      }
+    };
+
+    applyTheme();
+    localStorage.setItem('stinora_theme', themeMode);
+
+    const handler = () => {
+      if (themeMode === 'system') applyTheme();
+    };
+
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, [themeMode]);
 
   // Persistent Bookings Engine
   const [bookings, setBookings] = useState<BookingRecord[]>(() => {
@@ -259,6 +296,8 @@ function App() {
                   back={back} 
                   resetHome={() => { setHistory(['welcome']); setScreen('welcome'); }}
                   nav={nav}
+                  themeMode={themeMode}
+                  setThemeMode={setThemeMode}
                 />
               </motion.div>
             )}

@@ -31,20 +31,20 @@ export default function WelcomeScreen({ nav }: { nav: any }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 30 }}
         >
-          <div className="inline-block border border-editorial-600 rounded-full px-3 py-1 mb-6">
-            <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-editorial-300">StinOra Studio</p>
+          <div className="inline-block border border-editorial-600 rounded-full px-3 py-1 mb-6 bg-editorial-800/80">
+            <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-editorial-400 font-bold">StinOra Grooming</p>
           </div>
-          <h1 className="font-sans font-bold text-[3.5rem] leading-[1.05] tracking-tighter text-editorial-50 mb-4">
-            Botanic<br/><span className="font-serif italic font-normal text-editorial-200">Architecture.</span>
+          <h1 className="font-sans font-bold text-[3.25rem] leading-[1.05] tracking-tighter text-editorial-50 mb-4">
+            Bespoke<br/><span className="font-serif italic font-normal text-editorial-200">Grooming.</span>
           </h1>
-          <p className="text-editorial-400 leading-relaxed mb-10 max-w-[280px]">
-            We design spaces and moments using rare, sculptural flora. Rejecting the generic bouquet.
+          <p className="text-editorial-400 text-sm leading-relaxed mb-8 max-w-[280px]">
+            Master stylists, precision fades, and bespoke treatments across Bangalore's premier salons.
           </p>
 
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <div className="flex bg-editorial-900 border border-editorial-600 rounded-lg overflow-hidden focus-within:border-editorial-300 transition-colors">
-                <span className="flex items-center justify-center px-4 bg-editorial-800 border-r border-editorial-600 text-editorial-300 font-mono text-xs">
+              <div className="flex bg-editorial-800 border border-editorial-600 rounded-lg overflow-hidden focus-within:border-brand-400 focus-within:ring-1 focus-within:ring-brand-400 transition-colors shadow-bento">
+                <span className="flex items-center justify-center px-4 bg-editorial-700/50 border-r border-editorial-600 text-editorial-300 font-mono text-xs font-bold">
                   +91
                 </span>
                 <input 
@@ -52,7 +52,8 @@ export default function WelcomeScreen({ nav }: { nav: any }) {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="Enter mobile number"
-                  className="flex-1 px-4 py-4 bg-transparent outline-none text-editorial-50 font-medium placeholder:text-editorial-600 text-sm"
+                  aria-label="Enter mobile number"
+                  className="flex-1 px-4 py-4 bg-transparent outline-none text-editorial-50 font-medium placeholder:text-editorial-500 text-sm"
                   required
                 />
               </div>
@@ -61,12 +62,12 @@ export default function WelcomeScreen({ nav }: { nav: any }) {
             <button 
               type="submit"
               disabled={loading || !phone}
-              className="w-full bg-brand-500 text-white shadow-glow font-bold py-4 rounded-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 flex justify-center items-center h-[56px] mt-2 hover:bg-brand-400"
+              className="w-full bg-brand-500 text-white shadow-glow font-bold py-4 rounded-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 flex justify-center items-center h-[56px] mt-2 hover:bg-brand-400 cursor-pointer"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               ) : (
-                "View Collections"
+                "Enter Studio"
               )}
             </button>
           </form>
