@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>StinOra - Salon Booking</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+  
+  <script src="https://unpkg.com/@lucide/web"></script>
+
+  <style>
+    /* ==========================================================================
+       THEME VARIABLES (Charcoal, Gold, White)
+       ========================================================================== */
+    :root {
+      /* Brand StinOra Theme (Default Dark) */
+      --paper: #121415;
+      --card: #1E2022;
+      --raise: #2A2C2F;
+      --ink: #FFFFFF;
+      --ink-soft: #9CA3AF;
+      --muted: #6B7280;
+      
+      --hair: rgba(255, 255, 255, 0.08);
+      --hair-strong: rgba(255, 255, 255, 0.15);
+      
+      --accent: #D4AF37;
+      --accent-ink: #121415;
+      --accent-wash: rgba(212, 175, 55, 0.12);
+      --accent-edge: rgba(212, 175, 55, 0.3);
+      
+      --good: #10B981;
+      --good-wash: rgba(16, 185, 129, 0.15);
+      
+      --warm: #F59E0B;
+      --ground: #000000;
+      
+      --shadow: 0 1px 2px rgba(0,0,0,0.5), 0 6px 18px -8px rgba(0,0,0,0.6);
+      --shadow-lift: 0 2px 6px rgba(0,0,0,0.5), 0 20px 46px -18px rgba(0,0,0,0.8);
+      --sheet-shadow: 0 -8px 60px -12px rgba(0,0,0,0.8);
+      --taps-bg: rgba(0,0,0,0.25);
+      --focus: #D4AF37;
+    }
+
+    /* Light Theme Toggle */
+    :root[data-theme="light"] {
+      --paper: #F6F4EF;
+      --card: #FFFFFF;
+      --raise: #FAF8F3;
+      --ink: #191612;
+      --ink-soft: #4C463D;
+      --muted: #8B8375;
+      --hair: #E6E1D6;
+      --hair-strong: #D5CEC0;
+      
+      --accent: #D4AF37;
+      --accent-ink: #FFFFFF;
+      --accent-wash: #FBF7EA;
+      --accent-edge: #EEDFA3;
+      
+      --good: #1C7F4D;
+      --good-wash: #E2F1E9;
+      --warm: #B4541F;
+      --ground: #EDE9E0;
+      
+      --shadow: 0 1px 2px rgba(31,26,18,0.05), 0 6px 18px -8px rgba(31,26,18,0.13);
+      --shadow-lift: 0 2px 6px rgba(31,26,18,0.07), 0 20px 46px -18px rgba(31,26,18,0.30);
+      --sheet-shadow: 0 -8px 60px -12px rgba(31,26,18,0.32);
+      --taps-bg: rgba(255,255,255,0.18);
+      --focus: #D4AF37;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--ground);
+      color: var(--ink);
+      font-family: "Geist", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+    button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; text-align: left; }
+    :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+
+    /* ==========================================================================
+       APP FRAME & NAVIGATION
+       ========================================================================== */
+    .app {
+      position: relative;
+      width: 100%;
+      max-width: 448px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      background: var(--paper);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    @media (min-width: 540px) {
+      .app {
+        min-height: 0;
+        height: min(884px, calc(100dvh - 48px));
+        margin: 24px auto;
+        border-radius: 30px;
+        box-shadow: var(--shadow-lift);
+        border: 1px solid var(--hair);
+      }
+    }
+
+    .view-stack {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .view-panel {
+      position: absolute;
+      inset: 0;
+      background: var(--paper);
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.3s ease;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .view-panel.active {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 20;
+    }
+    .feed {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 24px;
+      scrollbar-width: none;
+    }
+    .feed::-webkit-scrollbar { display: none; }
+    
+    .sticky-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 16px 20px;
+      background: linear-gradient(to top, var(--paper) 70%, transparent);
+      z-index: 30;
+      display: none;
+    }
+    .view-panel.active .sticky-footer { display: block; }
+
+    /* ==========================================================================
+       COMMON UI COMPONENTS
+       ========================================================================== */
+    .top { padding: 20px 20px 12px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .sub-top { padding: 16px 20px; display: flex; align-items: center; gap: 14px; background: var(--card); border-bottom: 1px solid var(--hair); flex: 0 0 auto;}
+    .back-btn { 
+      width: 36px; height: 36px; border-radius: 50%;
+      display: grid; place-items: center;
+      border: 1px solid var(--hair-strong); background: var(--raise);
+      color: var(--ink);
+    }
+    .sub-top h2 { margin: 0; font-family: "Bricolage Grotesque", sans-serif; font-weight: 600; font-size: 19px; letter-spacing: -0.01em; }
+
+    .eyebrow { font-family: "Geist Mono", monospace; font-size: 10.5px; letter-spacing: 0.11em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+    .hello { font-family: "Bricolage Grotesque", sans-serif; font-weight: 600; font-size: 27px; line-height: 1.05; letter-spacing: -0.024em; margin: 0 0 7px; color: var(--accent); }
+    .place { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--ink-soft); margin: 0; }
+    .place i { width: 14px; height: 14px; color: var(--accent); }
+    .topright { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; padding-top: 3px; }
+    .iconbtn { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--hair-strong); background: var(--card); font-size: 14px; }
+    .me { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-wash); color: var(--accent); display: grid; place-items: center; font-weight: 600; font-size: 13px; border: 1px solid var(--accent-edge); }
+
+    .sec { padding: 0 20px; margin-bottom: 24px; }
+    .sechead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 0 0 14px; }
+    .sectitle { font-family: "Geist Mono", monospace; font-size: 10.5px; letter-spacing: 0.11em; text-transform: uppercase; color: var(--muted); margin: 0; }
+
+    .cta {
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      width: 100%; min-height: 52px; padding: 0 18px;
+      background: var(--accent); color: var(--accent-ink); border-radius: 14px;
+      font-size: 15.5px; font-weight: 600; letter-spacing: -0.01em;
+      transition: transform 0.12s ease, filter 0.15s ease;
+    }
+    .cta:active { transform: scale(0.985); }
+    .cta:disabled { background: var(--raise); color: var(--muted); pointer-events: none; border: 1px solid var(--hair-strong); }
+    
+    .taps { font-family: "Geist Mono", monospace; font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; padding: 3px 7px; border-radius: 5px; background: var(--taps-bg); }
+
+    /* ==========================================================================
+       SCREEN 1: HOME COMPONENTS
+       ========================================================================== */
+    .search-box {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--card); border: 1px solid var(--hair); border-radius: 16px;
+      padding: 14px 16px; box-shadow: var(--shadow); margin-bottom: 12px;
+    }
+    .search-box i { color: var(--muted); width: 18px; height: 18px; }
+    .search-box input { border: none; background: transparent; color: var(--ink); font-size: 14.5px; flex: 1; }
+    
+    .chips { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; margin: 0 -20px; padding: 0 20px 4px; }
+    .chips::-webkit-scrollbar { display: none; }
+    .schip {
+      flex: 0 0 auto;
+      font-size: 12px; font-weight: 500;
+      padding: 8px 14px; border-radius: 99px;
+      border: 1px solid var(--hair-strong); background: var(--raise); color: var(--ink-soft);
+    }
+    .schip:active { background: var(--accent-wash); color: var(--accent); border-color: var(--accent-edge); }
+
+    .rail { display: flex; gap: 11px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 3px 20px 6px; margin: 0 -20px; scrollbar-width: none; }
+    .rail::-webkit-scrollbar { display: none; }
+    .bcard {
+      flex: 0 0 240px; scroll-snap-align: start;
+      background: var(--card); border: 1px solid var(--hair);
+      border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; display: block; padding: 0;
+    }
+    .bcard:active { transform: scale(0.98); }
+    .bbody { padding: 14px; }
+    .bname { display: block; font-size: 15.5px; font-weight: 600; line-height: 1.2; font-family: "Bricolage Grotesque", sans-serif; }
+    .brole { display: block; font-size: 12.5px; color: var(--ink-soft); margin-top: 4px; line-height: 1.3; }
+    .bfoot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--hair); font-size: 12px; color: var(--muted); }
+    .brebook { color: var(--accent); font-weight: 600; background: var(--accent-wash); padding: 6px 12px; border-radius: 8px; }
+
+    /* ==========================================================================
+       SCREEN 2: SALON PROFILE
+       ========================================================================== */
+    .hero-img-box { position: relative; height: 260px; width: 100%; flex: 0 0 auto; }
+    .hero-img-box img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,0.1), var(--paper)); }
+    .hero-abs-btn { position: absolute; top: 20px; left: 20px; z-index: 10; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); border-color: rgba(255,255,255,0.2); color: #FFF; }
+    
+    .salon-info { position: relative; margin-top: -50px; z-index: 5; padding: 0 20px; }
+    .s-title { font-family: "Bricolage Grotesque", sans-serif; font-weight: 600; font-size: 28px; line-height: 1.1; margin: 0 0 6px; }
+    .s-rating { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--warm); font-weight: 600; }
+    .s-rating i { fill: var(--warm); width: 16px; height: 16px; }
+    .s-rating span { color: var(--ink-soft); font-weight: 400; }
+
+    .story { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; margin-bottom: 24px; }
+    
+    .table { background: var(--card); border-radius: 16px; border: 1px solid var(--hair); overflow: hidden; box-shadow: var(--shadow); }
+    .t-row { display: flex; justify-content: space-between; padding: 14px 16px; font-size: 14px; border-bottom: 1px solid var(--hair); }
+    .t-row:last-child { border-bottom: none; }
+    .t-row span:last-child { font-family: "Geist Mono", monospace; color: var(--accent); font-weight: 500; }
+
+    /* ==========================================================================
+       SCREEN 3: BARBER SELECTION
+       ========================================================================== */
+    .barber-list { display: flex; flex-direction: column; gap: 12px; }
+    .barber-row {
+      display: flex; align-items: center; gap: 14px; padding: 14px;
+      background: var(--card); border: 1px solid var(--hair); border-radius: 16px;
+      box-shadow: var(--shadow); transition: transform 0.12s ease;
+    }
+    .barber-row:active { transform: scale(0.975); }
+    .b-avatar { position: relative; width: 60px; height: 60px; border-radius: 50%; flex: 0 0 auto; background: var(--raise); }
+    .b-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .beacon {
+      position: absolute; bottom: 2px; right: 2px; width: 14px; height: 14px;
+      background: var(--good); border-radius: 50%; border: 2.5px solid var(--card);
+    }
+    .beacon.off { background: var(--muted); }
+    .b-info { flex: 1; min-width: 0; }
+    .b-info h3 { font-family: "Bricolage Grotesque", sans-serif; font-size: 16.5px; font-weight: 600; margin: 0 0 2px; }
+    .b-info .spec { font-size: 12.5px; color: var(--accent); font-weight: 500; }
+    .b-info .exp { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+    .b-rate { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .b-rate-val { display: flex; align-items: center; gap: 3px; font-weight: 600; font-size: 13.5px; }
+    .b-rate-val i { width: 13px; height: 13px; fill: var(--warm); color: var(--warm); }
+
+    /* ==========================================================================
+       SCREEN 4: SCHEDULE & BOOKING
+       ========================================================================== */
+    .miniprofile {
+      display: flex; align-items: center; gap: 12px; padding: 14px 20px;
+      background: var(--card); border-bottom: 1px solid var(--hair); flex: 0 0 auto;
+    }
+    .miniprofile img { width: 44px; height: 44px; border-radius: 50%; }
+    .miniprofile h3 { margin: 0; font-size: 15px; }
+    .miniprofile p { margin: 2px 0 0; font-size: 12px; color: var(--ink-soft); }
+
+    .date-rail { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding: 0 20px 4px; margin: 0 -20px; }
+    .date-rail::-webkit-scrollbar { display: none; }
+    .d-card {
+      flex: 0 0 68px; height: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+      background: var(--card); border: 1px solid var(--hair); border-radius: 14px; box-shadow: var(--shadow);
+    }
+    .d-card.active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); box-shadow: 0 4px 12px var(--accent-wash); }
+    .d-card .day { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; font-family: "Geist Mono", monospace; }
+    .d-card .num { font-size: 19px; font-weight: 600; font-family: "Bricolage Grotesque", sans-serif; }
+
+    .slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .slot {
+      padding: 12px 0; text-align: center; font-family: "Geist Mono", monospace; font-size: 13.5px; font-weight: 500;
+      background: var(--card); border: 1px solid var(--hair); border-radius: 10px; transition: 0.1s;
+    }
+    .slot.booked { opacity: 0.35; text-decoration: line-through; pointer-events: none; background: var(--raise); }
+    .slot.available:active { transform: scale(0.95); }
+    .slot.selected { background: var(--accent-wash); color: var(--accent); border-color: var(--accent-edge); }
+
+    .svcs { display: flex; flex-direction: column; gap: 10px; }
+    .svc-check { display: flex; align-items: center; justify-content: space-between; padding: 14px; background: var(--card); border: 1px solid var(--hair); border-radius: 12px; cursor: pointer; }
+    .svc-check[aria-pressed="true"] { background: var(--accent-wash); border-color: var(--accent-edge); }
+    .svc-check .s-name { font-size: 14px; font-weight: 500; }
+    .svc-check .s-price { font-family: "Geist Mono", monospace; font-size: 14px; color: var(--accent); font-weight: 500; }
+
+    /* ==========================================================================
+       SCREEN 5: BILLING & PAYMENT
+       ========================================================================== */
+    .bill-card { background: var(--card); border: 1px solid var(--hair); border-radius: 16px; padding: 16px; margin-bottom: 24px; box-shadow: var(--shadow); }
+    .b-salon { font-family: "Bricolage Grotesque", sans-serif; font-size: 18px; color: var(--accent); margin: 0 0 12px; padding-bottom: 12px; border-bottom: 1px solid var(--hair); }
+    .c-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; font-size: 13.5px; margin-bottom: 10px; }
+    .c-row:last-child { margin-bottom: 0; }
+    .c-lbl { color: var(--muted); font-family: "Geist Mono", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; width: 60px; }
+    .c-val { flex: 1; font-weight: 500; text-align: right; }
+    
+    .breakdown { margin-bottom: 24px; }
+    .bd-row { display: flex; justify-content: space-between; font-size: 13.5px; color: var(--ink-soft); margin-bottom: 10px; }
+    .bd-tot { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--hair-strong); color: var(--ink); font-weight: 500; font-size: 15px; }
+    .bd-tot .big { font-family: "Geist Mono", monospace; font-size: 20px; color: var(--accent); }
+
+    .pay-methods { display: flex; flex-direction: column; gap: 10px; }
+    .pay-btn {
+      display: flex; align-items: center; gap: 14px; padding: 16px;
+      background: var(--card); border: 1px solid var(--hair); border-radius: 14px;
+    }
+    .pay-btn[aria-pressed="true"] { background: var(--accent-wash); border-color: var(--accent-edge); }
+    .pay-btn i { color: var(--accent); }
+    .pay-txt { font-size: 14px; font-weight: 500; flex: 1; }
+    .pay-check { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--hair-strong); }
+    .pay-btn[aria-pressed="true"] .pay-check { border-color: var(--accent); background: var(--accent); box-shadow: inset 0 0 0 3px var(--accent-wash); }
+
+    /* ==========================================================================
+       SUCCESS OVERLAY (re-used from rebook.html)
+       ========================================================================== */
+    .success {
+      position: absolute; inset: 0; z-index: 50; background: var(--paper);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 32px 26px; text-align: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .success.show { opacity: 1; pointer-events: auto; }
+    .check { width: 64px; height: 64px; margin-bottom: 20px; }
+    .check circle { fill: var(--good-wash); stroke: var(--good); stroke-width: 1.5; }
+    .check path { fill: none; stroke: var(--good); stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 32; stroke-dashoffset: 32; }
+    .success.show .check { animation: pop 0.5s cubic-bezier(0.2, 1.5, 0.5, 1) both; }
+    .success.show .check path { animation: draw 0.45s 0.22s ease forwards; }
+    @keyframes pop { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+    
+    .stitle { font-family: "Bricolage Grotesque", sans-serif; font-weight: 600; font-size: 25px; letter-spacing: -0.026em; margin: 0 0 7px; }
+    .ssub { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 22px; line-height: 1.5; }
+    .done { margin-top: 26px; min-height: 46px; padding: 0 26px; text-align: center; border-radius: 12px; border: 1px solid var(--hair-strong); background: var(--card); font-size: 14px; font-weight: 500; }
+    .done:hover { background: var(--raise); }
+
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- =========================================================
+       VIEW STACK CONTAINER
+       ========================================================= -->
+  <div class="view-stack">
+
+    <!-- =========================
+         SCREEN 1: HOME
+         ========================= -->
+    <main class="view-panel active" id="view-home">
+      <header class="top">
+        <div>
+          <p class="eyebrow">StinOra App</p>
+          <h1 class="hello">StinOra</h1>
+          <p class="place"><i data-lucide="map-pin"></i> Indiranagar, BLR</p>
+        </div>
+        <div class="topright">
+          <button class="iconbtn" id="themeBtn" title="Toggle Theme"><i data-lucide="moon"></i></button>
+          <div class="me">AM</div>
+        </div>
+      </header>
+      
+      <div class="feed">
+        <section class="sec">
+          <div class="search-box">
+            <i data-lucide="search"></i>
+            <input type="text" placeholder="Search salons, services..." readonly>
+          </div>
+          <div class="chips">
+            <button class="schip">Skin Fade</button>
+            <button class="schip">Toni & Guy</button>
+            <button class="schip">Beard Sculpt</button>
+          </div>
+        </section>
+
+        <section class="sec">
+          <div class="sechead"><p class="sectitle">Your Usual / Previous</p></div>
+          <div class="rail">
+            <!-- Card 1 -->
+            <button class="bcard" onclick="nav('view-salon')">
+              <div class="bbody">
+                <span class="bname">The Crown Salon</span>
+                <span class="brole">19 Aug &bull; Rohan Mehra</span>
+                <div class="bfoot">
+                  <span>Skin Fade + Sculpt</span>
+                  <span class="brebook">Rebook</span>
+                </div>
+              </div>
+            </button>
+            <!-- Card 2 -->
+            <button class="bcard" onclick="nav('view-salon')">
+              <div class="bbody">
+                <span class="bname">Urban Groomers</span>
+                <span class="brole">02 Aug &bull; Samir K.</span>
+                <div class="bfoot">
+                  <span>Classic Cut</span>
+                  <span class="brebook">Rebook</span>
+                </div>
+              </div>
+            </button>
+          </div>
+        </section>
+
+        <section class="sec" style="margin-top:10px;">
+          <div class="sechead"><p class="sectitle">Top Rated Near You</p></div>
+          <div class="barber-list">
+            <button class="barber-row" onclick="nav('view-salon')">
+              <div class="b-avatar"><img src="../assets/salon_hero.jpg" alt="Salon"></div>
+              <div class="b-info">
+                <h3>The Crown Salon</h3>
+                <span class="exp">12th Main Rd &bull; 1.2 km</span>
+              </div>
+              <div class="b-rate">
+                <span class="b-rate-val">4.9 <i data-lucide="star"></i></span>
+              </div>
+            </button>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- =========================
+         SCREEN 2: SALON PROFILE
+         ========================= -->
+    <main class="view-panel" id="view-salon">
+      <div class="hero-img-box">
+        <button class="back-btn hero-abs-btn" onclick="back()"><i data-lucide="arrow-left"></i></button>
+        <img src="../assets/salon_hero.jpg" alt="Salon Interior">
+        <div class="hero-overlay"></div>
+      </div>
+      
+      <div class="feed" style="padding-bottom: 90px;">
+        <div class="salon-info">
+          <h1 class="s-title">The Crown Salon</h1>
+          <div class="s-rating"><i data-lucide="star"></i> 4.96 <span>(428 reviews)</span></div>
+        </div>
+
+        <section class="sec" style="margin-top: 24px;">
+          <div class="sechead"><p class="sectitle">Our Story</p></div>
+          <p class="story">Luxury grooming for the modern gentleman. We specialize in precision fades, hot towel shaves, and a premium atmosphere built to refresh and re-energize.</p>
+          
+          <div class="sechead"><p class="sectitle">Average Pricing</p></div>
+          <div class="table">
+            <div class="t-row"><span>Haircut</span><span>₹300 - ₹500</span></div>
+            <div class="t-row"><span>Beard Trim</span><span>₹150 - ₹250</span></div>
+            <div class="t-row"><span>Hair Color</span><span>₹1000+</span></div>
+            <div class="t-row"><span>Scalp Spa</span><span>₹800+</span></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="sticky-footer">
+        <button class="cta" onclick="nav('view-barbers')">Book Your Barber <span class="taps">1 / 3</span></button>
+      </div>
+    </main>
+
+    <!-- =========================
+         SCREEN 3: BARBER SELECTION
+         ========================= -->
+    <main class="view-panel" id="view-barbers">
+      <header class="sub-top">
+        <button class="back-btn" onclick="back()"><i data-lucide="arrow-left"></i></button>
+        <h2>Select Your Barber</h2>
+      </header>
+
+      <div class="feed">
+        <section class="sec" style="margin-top:20px;">
+          <div class="barber-list">
+            
+            <button class="barber-row" onclick="nav('view-schedule')">
+              <div class="b-avatar">
+                <img id="b-img-1" src="" alt="">
+                <div class="beacon"></div>
+              </div>
+              <div class="b-info">
+                <h3>Rohan Mehra</h3>
+                <span class="spec">Skin Fade Specialist</span>
+                <div class="exp">8+ Years Experience</div>
+              </div>
+              <div class="b-rate">
+                <span class="b-rate-val">4.9 <i data-lucide="star"></i></span>
+              </div>
+            </button>
+
+            <button class="barber-row" onclick="nav('view-schedule')">
+              <div class="b-avatar">
+                <img id="b-img-2" src="" alt="">
+                <div class="beacon off"></div>
+              </div>
+              <div class="b-info">
+                <h3>Vikram Singh</h3>
+                <span class="spec">Classic Cuts</span>
+                <div class="exp">12+ Years Experience</div>
+              </div>
+              <div class="b-rate">
+                <span class="b-rate-val">4.7 <i data-lucide="star"></i></span>
+              </div>
+            </button>
+
+            <button class="barber-row" onclick="nav('view-schedule')">
+              <div class="b-avatar">
+                <img id="b-img-3" src="" alt="">
+                <div class="beacon"></div>
+              </div>
+              <div class="b-info">
+                <h3>Imran Ali</h3>
+                <span class="spec">Scalp & Spa Expert</span>
+                <div class="exp">5+ Years Experience</div>
+              </div>
+              <div class="b-rate">
+                <span class="b-rate-val">4.8 <i data-lucide="star"></i></span>
+              </div>
+            </button>
+
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- =========================
+         SCREEN 4: SCHEDULE & BOOKING
+         ========================= -->
+    <main class="view-panel" id="view-schedule">
+      <header class="sub-top">
+        <button class="back-btn" onclick="back()"><i data-lucide="arrow-left"></i></button>
+        <h2>Schedule & Services</h2>
+      </header>
+
+      <div class="miniprofile">
+        <img id="b-img-mini" src="" alt="Rohan">
+        <div>
+          <h3>Rohan Mehra</h3>
+          <p>Skin Fade Specialist</p>
+        </div>
+      </div>
+
+      <div class="feed" style="padding-bottom: 90px;">
+        <section class="sec" style="margin-top:20px;">
+          <div class="sechead"><p class="sectitle">Pick a Date</p></div>
+          <div class="date-rail">
+            <button class="d-card active"><span class="day">Today</span><span class="num">06</span></button>
+            <button class="d-card"><span class="day">Tom</span><span class="num">07</span></button>
+            <button class="d-card"><span class="day">Mon</span><span class="num">08</span></button>
+            <button class="d-card"><span class="day">Tue</span><span class="num">09</span></button>
+          </div>
+        </section>
+
+        <section class="sec">
+          <div class="sechead"><p class="sectitle">Select Time Slot</p></div>
+          <div class="slots-grid" id="slots">
+            <button class="slot booked">10:00 AM</button>
+            <button class="slot available">10:30 AM</button>
+            <button class="slot booked">11:00 AM</button>
+            <button class="slot available">02:00 PM</button>
+            <button class="slot available">02:30 PM</button>
+            <button class="slot booked">03:30 PM</button>
+            <button class="slot available">04:30 PM</button>
+            <button class="slot available">05:00 PM</button>
+            <button class="slot available">06:30 PM</button>
+          </div>
+        </section>
+
+        <section class="sec">
+          <div class="sechead"><p class="sectitle">Select Services</p></div>
+          <div class="svcs" id="svcs">
+            <button class="svc-check" data-price="400" aria-pressed="true">
+              <span class="s-name">Skin Fade</span>
+              <span class="s-price">₹400</span>
+            </button>
+            <button class="svc-check" data-price="200" aria-pressed="false">
+              <span class="s-name">Beard Sculpt</span>
+              <span class="s-price">₹200</span>
+            </button>
+            <button class="svc-check" data-price="350" aria-pressed="false">
+              <span class="s-name">Head Massage</span>
+              <span class="s-price">₹350</span>
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <div class="sticky-footer">
+        <button class="cta" id="btn-schedule" onclick="nav('view-billing')" disabled>Confirm Time & Service <span class="taps">2 / 3</span></button>
+      </div>
+    </main>
+
+    <!-- =========================
+         SCREEN 5: BILLING & PAYMENT
+         ========================= -->
+    <main class="view-panel" id="view-billing">
+      <header class="sub-top">
+        <button class="back-btn" onclick="back()"><i data-lucide="arrow-left"></i></button>
+        <h2>Checkout & Pay</h2>
+      </header>
+
+      <div class="feed" style="padding-bottom: 90px;">
+        <section class="sec" style="margin-top:20px;">
+          
+          <div class="bill-card">
+            <h3 class="b-salon">The Crown Salon</h3>
+            <div class="c-row"><span class="c-lbl">Barber</span><span class="c-val">Rohan Mehra</span></div>
+            <div class="c-row"><span class="c-lbl">Slot</span><span class="c-val" id="checkout-time">Today, 04:30 PM</span></div>
+            <div class="c-row"><span class="c-lbl">Service</span><span class="c-val" id="checkout-svcs">Skin Fade</span></div>
+          </div>
+
+          <div class="breakdown">
+            <div class="bd-row"><span>Service Cost</span><span id="c-sub">₹400</span></div>
+            <div class="bd-row"><span>Taxes & Fees (5%)</span><span id="c-tax">₹20</span></div>
+            <div class="bd-row bd-tot"><span>Total Payable</span><span class="big" id="c-tot">₹420</span></div>
+          </div>
+
+          <div class="sechead"><p class="sectitle">Pay With</p></div>
+          <div class="pay-methods" id="paym">
+            <button class="pay-btn" aria-pressed="true" data-type="upi">
+              <i data-lucide="smartphone"></i>
+              <span class="pay-txt">UPI (GPay, PhonePe)</span>
+              <div class="pay-check"></div>
+            </button>
+            <button class="pay-btn" aria-pressed="false" data-type="card">
+              <i data-lucide="credit-card"></i>
+              <span class="pay-txt">Credit / Debit Card</span>
+              <div class="pay-check"></div>
+            </button>
+            <button class="pay-btn" aria-pressed="false" data-type="store">
+              <i data-lucide="store"></i>
+              <span class="pay-txt">Pay at Store</span>
+              <div class="pay-check"></div>
+            </button>
+          </div>
+
+        </section>
+      </div>
+
+      <div class="sticky-footer">
+        <button class="cta" id="btn-pay" onclick="simulatePay()">Pay ₹420 & Confirm <span class="taps">3 / 3</span></button>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Success Overlay -->
+  <div class="success" id="success">
+    <svg class="check" viewBox="0 0 52 52" aria-hidden="true">
+      <circle cx="26" cy="26" r="24"/>
+      <path d="M15 27l7.5 7.5L37.5 19"/>
+    </svg>
+    <h2 class="stitle">Booking Confirmed!</h2>
+    <p class="ssub">Your barber has been notified. See you at <strong id="success-time"></strong>!</p>
+
+    <div class="bill-card" style="width:100%; max-width:330px; text-align:left; background:var(--card); margin-bottom:20px;">
+      <div class="c-row"><span class="c-lbl">Ticket</span><span class="c-val" style="font-family:monospace; color:var(--accent);">#STN829</span></div>
+      <div class="c-row" style="margin-top:8px;"><span class="c-lbl">Barber</span><span class="c-val">Rohan Mehra</span></div>
+    </div>
+
+    <button class="done" onclick="resetToHome()">Back to Home</button>
+  </div>
+
+</div>
+
+<script>
+  lucide.createIcons();
+
+  /* deterministic portrait generator from rebook.html */
+  function portrait(seed, initial, size){
+    var h = 0, i;
+    for (i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) % 360;
+    var a = h, b = (h + 42) % 360;
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="'+size+'" height="'+size+'" viewBox="0 0 100 100">'+
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl('+a+',44%,40%)"/><stop offset="1" stop-color="hsl('+b+',50%,20%)"/></linearGradient></defs>'+
+      '<rect width="100" height="100" fill="url(#g)"/>'+
+      '<circle cx="50" cy="40" r="16" fill="rgba(255,255,255,.20)"/>'+
+      '<path d="M18 100c4-19 16-28 32-28s28 9 32 28z" fill="rgba(255,255,255,.20)"/>'+
+      '<text x="50" y="57" font-family="Helvetica,sans-serif" font-size="28" font-weight="700" fill="rgba(255,255,255,.8)" text-anchor="middle">'+initial+'</text></svg>';
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  }
+
+  document.getElementById('b-img-1').src = portrait('rohan-mehra', 'R', 120);
+  document.getElementById('b-img-2').src = portrait('vikram-singh', 'V', 120);
+  document.getElementById('b-img-3').src = portrait('imran-ali', 'I', 120);
+  document.getElementById('b-img-mini').src = portrait('rohan-mehra', 'R', 80);
+
+  // Theme Toggle
+  const themeBtn = document.getElementById('themeBtn');
+  const root = document.documentElement;
+  themeBtn.addEventListener('click', () => {
+    const cur = root.getAttribute('data-theme');
+    root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  });
+
+  // Navigation Logic
+  const stack = ['view-home'];
+  function nav(id) {
+    document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    stack.push(id);
+  }
+  function back() {
+    if (stack.length > 1) {
+      stack.pop();
+      const prev = stack[stack.length - 1];
+      document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById(prev).classList.add('active');
+    }
+  }
+
+  // Schedule Logic
+  let selTime = null;
+  const slots = document.querySelectorAll('#slots .available');
+  const btnSched = document.getElementById('btn-schedule');
+
+  slots.forEach(s => {
+    s.addEventListener('click', () => {
+      slots.forEach(x => x.classList.remove('selected'));
+      s.classList.add('selected');
+      selTime = s.textContent;
+      validateSched();
+    });
+  });
+
+  const svcs = document.querySelectorAll('#svcs .svc-check');
+  svcs.forEach(sc => {
+    sc.addEventListener('click', () => {
+      const p = sc.getAttribute('aria-pressed') === 'true';
+      sc.setAttribute('aria-pressed', !p);
+      validateSched();
+    });
+  });
+
+  function validateSched() {
+    let tot = 0;
+    let sNames = [];
+    document.querySelectorAll('#svcs .svc-check[aria-pressed="true"]').forEach(el => {
+      tot += parseInt(el.dataset.price);
+      sNames.push(el.querySelector('.s-name').textContent);
+    });
+    
+    if (selTime && tot > 0) {
+      btnSched.disabled = false;
+      // Update checkout
+      document.getElementById('checkout-time').textContent = 'Today, ' + selTime;
+      document.getElementById('checkout-svcs').textContent = sNames.join(', ');
+      
+      const tax = Math.round(tot * 0.05);
+      const grand = tot + tax;
+      document.getElementById('c-sub').textContent = '₹' + tot;
+      document.getElementById('c-tax').textContent = '₹' + tax;
+      document.getElementById('c-tot').textContent = '₹' + grand;
+      
+      const payBtn = document.getElementById('btn-pay');
+      const isStore = document.querySelector('#paym .pay-btn[aria-pressed="true"]').dataset.type === 'store';
+      payBtn.innerHTML = (isStore ? 'Confirm & Pay at Store' : 'Pay ₹'+grand+' & Confirm') + ' <span class="taps">3 / 3</span>';
+      
+    } else {
+      btnSched.disabled = true;
+    }
+  }
+
+  // Payment Methods
+  const paym = document.querySelectorAll('#paym .pay-btn');
+  paym.forEach(p => {
+    p.addEventListener('click', () => {
+      paym.forEach(x => x.setAttribute('aria-pressed', 'false'));
+      p.setAttribute('aria-pressed', 'true');
+      validateSched();
+    });
+  });
+
+  function simulatePay() {
+    const btn = document.getElementById('btn-pay');
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Processing...';
+    lucide.createIcons();
+    btn.disabled = true;
+
+    setTimeout(() => {
+      btn.innerHTML = orig;
+      btn.disabled = false;
+      document.getElementById('success-time').textContent = selTime || '04:30 PM';
+      document.getElementById('success').classList.add('show');
+    }, 1200);
+  }
+
+  function resetToHome() {
+    document.getElementById('success').classList.remove('show');
+    stack.length = 0;
+    stack.push('view-home');
+    document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('view-home').classList.add('active');
+  }
+
+  // Inject spin anim for loader
+  const style = document.createElement('style');
+  style.innerHTML = `@keyframes spin { 100% { transform: rotate(360deg); } } .spin { animation: spin 1s linear infinite; }`;
+  document.head.appendChild(style);
+
+</script>
+</body>
+</html>
