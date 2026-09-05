@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { MapPin } from 'lucide-react';
 import { MOCK_DATA } from '../App';
 
-export default function HomeScreen({ nav, onSelectSalon }: { nav: any, onSelectSalon: any }) {
+export default function HomeScreen({ nav, onSelectSalon, setBarber }: { nav: any, onSelectSalon: any, setBarber: any }) {
   const container: any = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.08 } }
@@ -30,7 +30,7 @@ export default function HomeScreen({ nav, onSelectSalon }: { nav: any, onSelectS
           </p>
         </div>
         <div className="flex gap-2">
-           <button className="w-10 h-10 rounded-full bg-editorial-50 text-editorial-950 font-bold text-sm flex items-center justify-center">
+           <button className="w-10 h-10 rounded-full bg-brand-500 text-white shadow-glow font-bold text-sm flex items-center justify-center">
              A
            </button>
         </div>
@@ -60,8 +60,8 @@ export default function HomeScreen({ nav, onSelectSalon }: { nav: any, onSelectS
           </div>
 
           <button 
-             onClick={() => nav('schedule')}
-             className="w-full bg-editorial-50 text-editorial-950 font-bold py-3.5 rounded-lg active:scale-[0.98] transition-all flex justify-between items-center px-5 group hover:bg-white"
+             onClick={() => { setBarber(MOCK_DATA.barbers[0]); nav('schedule'); }}
+             className="w-full bg-brand-500 text-white shadow-glow font-bold py-3.5 rounded-lg active:scale-[0.98] transition-all flex justify-between items-center px-5 group hover:bg-brand-400"
           >
              <span>Rebook</span>
              <span className="font-mono text-[9px] font-bold tracking-widest text-editorial-500 bg-black/5 px-2 py-1 rounded uppercase">2 Taps</span>
@@ -72,6 +72,7 @@ export default function HomeScreen({ nav, onSelectSalon }: { nav: any, onSelectS
         <motion.div variants={item}>
           <div className="flex items-baseline justify-between mb-4">
             <h2 className="font-mono text-[10px] tracking-widest uppercase font-semibold text-editorial-400">Switch It Up</h2>
+            <button onClick={() => nav('explore')} className="text-[10px] uppercase tracking-wider font-bold text-editorial-300 hover:text-editorial-50 transition-colors">See all</button>
           </div>
           
           <div className="grid grid-cols-2 gap-3">

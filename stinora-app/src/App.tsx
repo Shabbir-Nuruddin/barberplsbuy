@@ -8,6 +8,8 @@ import BarberSelectionScreen from './components/BarberSelectionScreen';
 import ScheduleScreen from './components/ScheduleScreen';
 import BillingScreen from './components/BillingScreen';
 import UserProfileScreen from './components/UserProfileScreen';
+import ExploreScreen from './components/ExploreScreen';
+import BookingsScreen from './components/BookingsScreen';
 
 // --- PRODUCTION MOCK DATA ---
 export const MOCK_DATA = {
@@ -103,6 +105,10 @@ function App() {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
   const nav = (toScreen: string) => {
+    // STATE GUARD: Prevent bypassing to schedule/billing without data
+    if (toScreen === 'schedule' && !selectedBarber) return;
+    if (toScreen === 'billing' && (!selectedTime || selectedServices.length === 0)) return;
+
     setDirection(1);
     setHistory([...history, toScreen]);
     setScreen(toScreen);
@@ -159,7 +165,19 @@ function App() {
 
             {screen === 'home' && (
               <motion.div key="home" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col">
-                <HomeScreen nav={nav} onSelectSalon={setSelectedSalon} />
+                <HomeScreen nav={nav} onSelectSalon={setSelectedSalon} setBarber={setSelectedBarber} />
+              </motion.div>
+            )}
+
+            {screen === 'explore' && (
+              <motion.div key="explore" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col">
+                <ExploreScreen nav={nav} onSelectSalon={setSelectedSalon} />
+              </motion.div>
+            )}
+
+            {screen === 'bookings' && (
+              <motion.div key="bookings" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col">
+                <BookingsScreen />
               </motion.div>
             )}
 
@@ -222,8 +240,8 @@ function App() {
                 const Icon = tab.icon;
                 return (
                   <button key={tab.id} onClick={() => nav(tab.id)} className="flex flex-col items-center gap-1.5 p-2 w-16 active:scale-95 transition-transform">
-                    <Icon size={24} className={active ? 'text-editorial-50' : 'text-editorial-400'} />
-                    <span className={`text-[10px] font-semibold tracking-wide ${active ? 'text-editorial-50' : 'text-editorial-500'}`}>{tab.label}</span>
+                    <Icon size={24} className={active ? 'text-brand-400' : 'text-editorial-400'} />
+                    <span className={`text-[10px] font-semibold tracking-wide ${active ? 'text-brand-400' : 'text-editorial-500'}`}>{tab.label}</span>
                   </button>
                 )
               })}

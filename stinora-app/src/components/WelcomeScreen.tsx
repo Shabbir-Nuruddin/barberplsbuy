@@ -61,10 +61,10 @@ export default function WelcomeScreen({ nav }: { nav: any }) {
             <button 
               type="submit"
               disabled={loading || !phone}
-              className="w-full bg-editorial-50 text-editorial-950 font-bold py-4 rounded-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 flex justify-center items-center h-[56px] mt-2 hover:bg-white"
+              className="w-full bg-brand-500 text-white shadow-glow font-bold py-4 rounded-lg active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 flex justify-center items-center h-[56px] mt-2 hover:bg-brand-400"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-editorial-950/30 border-t-editorial-950 rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               ) : (
                 "View Collections"
               )}

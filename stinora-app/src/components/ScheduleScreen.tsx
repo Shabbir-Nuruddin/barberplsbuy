@@ -70,7 +70,7 @@ export default function ScheduleScreen({
                   onClick={() => { setSelectedDate(d.id); setSelectedTime(null); }}
                   className={`snap-start flex-none w-[72px] h-[86px] rounded-lg flex flex-col items-center justify-center gap-1 border transition-all active:scale-[0.98] ${
                     active 
-                      ? 'bg-editorial-50 border-editorial-50 text-editorial-950 shadow-sm' 
+                      ? 'bg-brand-500 border-brand-500 text-white shadow-glow' 
                       : 'bg-editorial-800 border-editorial-600 text-editorial-300 shadow-bento hover:bg-editorial-700'
                   }`}
                 >
@@ -101,7 +101,7 @@ export default function ScheduleScreen({
                     booked 
                       ? 'opacity-30 bg-editorial-950 border border-editorial-600 line-through cursor-not-allowed text-editorial-500'
                       : selected 
-                        ? 'bg-editorial-50 border border-editorial-50 text-editorial-950 shadow-sm'
+                        ? 'bg-brand-500 border border-brand-500 text-white shadow-glow'
                         : 'bg-editorial-800 border border-editorial-600 text-editorial-200 active:scale-95 shadow-bento hover:bg-editorial-700'
                   }`}
                 >
@@ -126,12 +126,12 @@ export default function ScheduleScreen({
                   onClick={() => toggleService(srv.id)}
                   className={`flex justify-between items-center p-5 rounded-[1rem] border transition-all active:scale-[0.98] ${
                     selected
-                      ? 'bg-editorial-50 border-editorial-50 shadow-sm'
+                      ? 'bg-brand-500 border-brand-500 shadow-glow'
                       : 'bg-editorial-800 border-editorial-600 shadow-bento hover:bg-editorial-700'
                   }`}
                 >
-                  <span className={`font-bold text-sm tracking-tight ${selected ? 'text-editorial-950' : 'text-editorial-50'}`}>{srv.name}</span>
-                  <span className={`font-mono text-[11px] tracking-widest font-bold ${selected ? 'text-editorial-900/80' : 'text-editorial-300'}`}>₹{srv.price}</span>
+                  <span className={`font-bold text-sm tracking-tight ${selected ? 'text-white' : 'text-editorial-50'}`}>{srv.name}</span>
+                  <span className={`font-mono text-[11px] tracking-widest font-bold ${selected ? 'text-white/80' : 'text-editorial-300'}`}>₹{srv.price}</span>
                 </button>
               )
             })}
@@ -147,12 +147,12 @@ export default function ScheduleScreen({
           disabled={!isReady}
           className={`w-full font-bold py-4 rounded-lg transition-all pointer-events-auto flex items-center justify-center gap-2 ${
             isReady 
-              ? 'bg-editorial-50 text-editorial-950 active:scale-[0.98] shadow-sm hover:bg-white' 
+              ? 'bg-brand-500 text-white shadow-glow active:scale-[0.98] hover:bg-brand-400' 
               : 'bg-editorial-800 text-editorial-600 cursor-not-allowed border border-editorial-700'
           }`}
         >
           Confirm Details
-          <span className={`font-mono text-[9px] font-bold tracking-widest px-2 py-0.5 rounded ml-2 uppercase ${isReady ? 'bg-black/10 text-editorial-700' : 'bg-editorial-700 text-editorial-500'}`}>2/3</span>
+          <span className={`font-mono text-[9px] font-bold tracking-widest px-2 py-0.5 rounded ml-2 uppercase ${isReady ? 'bg-white/20 text-white' : 'bg-editorial-700 text-editorial-500'}`}>2/3</span>
         </button>
       </div>
 

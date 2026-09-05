@@ -95,13 +95,13 @@ export default function BillingScreen({ back, resetHome, barber, date, time, ser
                     onClick={() => setPayMethod(pm.id)}
                     className={`flex items-center gap-4 p-5 rounded-[1rem] border transition-all active:scale-[0.98] shadow-bento ${
                       active
-                        ? 'bg-editorial-50 border-editorial-50'
+                        ? 'bg-brand-500 border-brand-500 shadow-glow'
                         : 'bg-editorial-800 border-editorial-600 hover:bg-editorial-700'
                     }`}
                   >
-                    <Icon size={20} className={active ? 'text-editorial-950' : 'text-editorial-400'} />
-                    <span className={`flex-1 text-left font-bold text-sm tracking-tight ${active ? 'text-editorial-950' : 'text-editorial-100'}`}>{pm.label}</span>
-                    <div className={`w-4 h-4 rounded border ${active ? 'border-editorial-950 bg-editorial-950 shadow-[inset_0_0_0_2px_#F5EBE1]' : 'border-editorial-500'}`}></div>
+                    <Icon size={20} className={active ? 'text-white' : 'text-editorial-400'} />
+                    <span className={`flex-1 text-left font-bold text-sm tracking-tight ${active ? 'text-white' : 'text-editorial-100'}`}>{pm.label}</span>
+                    <div className={`w-4 h-4 rounded border ${active ? 'border-white bg-white shadow-[inset_0_0_0_2px_#5452FF]' : 'border-editorial-500'}`}></div>
                   </button>
                 )
               })}
@@ -116,12 +116,12 @@ export default function BillingScreen({ back, resetHome, barber, date, time, ser
         <button 
           onClick={handlePay}
           disabled={processing || success}
-          className="w-full bg-editorial-50 text-editorial-950 font-bold py-4 rounded-lg active:scale-[0.98] transition-all pointer-events-auto flex items-center justify-center gap-2 disabled:opacity-80 disabled:scale-100 hover:bg-white"
+          className="w-full bg-brand-500 text-white shadow-glow font-bold py-4 rounded-lg active:scale-[0.98] transition-all pointer-events-auto flex items-center justify-center gap-2 disabled:opacity-80 disabled:scale-100 hover:bg-brand-400"
         >
           {processing ? (
             <><Loader2 className="animate-spin" size={18} /> Processing...</>
           ) : (
-            <>{payMethod === 'store' ? 'Confirm Booking' : `Pay ₹${total}`} <span className="font-mono text-[9px] font-bold tracking-widest uppercase bg-black/10 text-editorial-700 px-2 py-0.5 rounded ml-2">3/3</span></>
+            <>{payMethod === 'store' ? 'Confirm Booking' : `Pay ₹${total}`} <span className="font-mono text-[9px] font-bold tracking-widest uppercase bg-white/20 text-white px-2 py-0.5 rounded ml-2">3/3</span></>
           )}
         </button>
       </div>

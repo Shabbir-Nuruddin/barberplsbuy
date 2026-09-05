@@ -66,7 +66,7 @@ export default function SalonProfileScreen({ nav, back, salon }: { nav: any, bac
       <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-editorial-900 via-editorial-900/90 to-transparent z-30 pointer-events-none pb-[calc(1.5rem+64px)]">
         <button 
           onClick={() => nav('barbers')}
-          className="w-full bg-editorial-50 text-editorial-950 font-bold py-4 rounded-lg hover:bg-white transition-colors pointer-events-auto flex items-center justify-center gap-2"
+          className="w-full bg-brand-500 text-white shadow-glow font-bold py-4 rounded-lg hover:bg-brand-400 transition-colors pointer-events-auto flex items-center justify-center gap-2"
         >
           View Stylists
           <span className="font-mono text-[9px] font-bold tracking-widest text-editorial-500 bg-black/5 px-2 py-0.5 rounded ml-2 uppercase">1/3</span>
