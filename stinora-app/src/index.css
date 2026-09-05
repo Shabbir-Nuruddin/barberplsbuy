@@ -4,9 +4,43 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* LIGHT URBAN SALON PALETTE (DEFAULT) */
+  --editorial-950: 236 233 227; /* #ECE9E3 - desktop backdrop */
+  --editorial-900: 250 248 245; /* #FAF8F5 - warm ivory/cream app surface */
+  --editorial-800: 255 255 255; /* #FFFFFF - crisp white card surface */
+  --editorial-700: 242 238 232; /* #F2EEE8 - inner dividers */
+  --editorial-600: 226 220 211; /* #E2DCD3 - crisp structural borders */
+  --editorial-500: 140 133 124; /* #8C857C - muted captions & indicators */
+  --editorial-400: 104 96 88;   /* #686058 - secondary readable text */
+  --editorial-300: 68 62 55;    /* #443E37 - strong labels */
+  --editorial-200: 44 39 34;    /* #2C2722 - secondary headings */
+  --editorial-100: 28 25 22;    /* #1C1916 - prominent titles */
+  --editorial-50: 18 16 14;     /* #12100E - primary deep charcoal */
+  --bento-shadow: 0 1px 3px rgba(28, 25, 22, 0.04), 0 0 0 1px rgba(28, 25, 22, 0.06);
+  --bento-hover-shadow: 0 6px 16px rgba(28, 25, 22, 0.08), 0 0 0 1px rgba(28, 25, 22, 0.1);
+}
+
+.dark {
+  /* DARK EDITORIAL LUXURY PALETTE */
+  --editorial-950: 7 7 7;       /* #070707 */
+  --editorial-900: 12 11 10;    /* #0C0B0A */
+  --editorial-800: 20 19 17;    /* #141311 */
+  --editorial-700: 28 26 24;    /* #1C1A18 */
+  --editorial-600: 42 39 36;    /* #2A2724 */
+  --editorial-500: 77 71 66;    /* #4D4742 */
+  --editorial-400: 115 107 99;  /* #736B63 */
+  --editorial-300: 153 142 132; /* #998E84 */
+  --editorial-200: 191 178 166; /* #BFB2A6 */
+  --editorial-100: 230 215 200; /* #E6D7C8 */
+  --editorial-50: 245 235 225;  /* #F5EBE1 */
+  --bento-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --bento-hover-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
 @layer base {
   body {
-    @apply bg-editorial-900 text-editorial-100 font-sans antialiased selection:bg-white/20 selection:text-white overflow-hidden;
+    @apply bg-editorial-950 text-editorial-100 font-sans antialiased selection:bg-brand-500 selection:text-white overflow-hidden;
   }
 }
 
