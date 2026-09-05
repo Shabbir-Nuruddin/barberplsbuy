@@ -1,10 +1,21 @@
-import { ArrowLeft, CreditCard, Clock, Settings, LogOut, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { ArrowLeft, CreditCard, Clock, Settings, LogOut, ChevronRight, ShieldCheck, X, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export default function UserProfileScreen({ back, resetHome }: { back: any, resetHome: any }) {
+export default function UserProfileScreen({ 
+  back, 
+  resetHome, 
+  nav 
+}: { 
+  back: any, 
+  resetHome: any, 
+  nav?: any 
+}) {
+  const [activeModal, setActiveModal] = useState<'payments' | 'settings' | 'terms' | null>(null);
+
   const container: any = {
     hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+    show: { opacity: 1, transition: { staggerChildren: 0.08 } }
   };
   const item: any = {
     hidden: { opacity: 0, y: 15 },
@@ -17,48 +28,94 @@ export default function UserProfileScreen({ back, resetHome }: { back: any, rese
       <header className="px-6 py-6 flex items-center gap-4 bg-editorial-900 shrink-0 z-10 border-b border-editorial-600/50">
         <button 
           onClick={back}
-          className="w-10 h-10 rounded border border-editorial-600 flex items-center justify-center text-editorial-200 hover:bg-editorial-800 transition-colors"
+          aria-label="Back to home"
+          className="w-10 h-10 rounded border border-editorial-600 flex items-center justify-center text-editorial-200 hover:bg-editorial-800 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
         >
           <ArrowLeft size={18} />
         </button>
-        <h2 className="font-serif italic text-xl tracking-tight text-editorial-50">Profile</h2>
+        <div>
+          <h2 className="font-serif italic text-xl tracking-tight text-editorial-50">Member Account</h2>
+          <p className="text-[10px] font-mono tracking-widest uppercase text-editorial-400">StinOra Black Tier</p>
+        </div>
       </header>
 
-      <motion.div variants={container} initial="hidden" animate="show" className="flex-1 overflow-y-auto no-scrollbar pb-24">
+      <motion.div variants={container} initial="hidden" animate="show" className="flex-1 overflow-y-auto no-scrollbar pb-28">
         
-        <motion.div variants={item} className="px-6 pt-10 pb-8 text-center flex flex-col items-center">
-          <div className="relative mb-6">
-            <div className="w-24 h-24 rounded-full border border-editorial-600 flex items-center justify-center bg-editorial-800 text-editorial-300 font-serif italic text-4xl">
+        <motion.div variants={item} className="px-6 pt-8 pb-6 text-center flex flex-col items-center">
+          <div className="relative mb-4">
+            <div className="w-24 h-24 rounded-full border-2 border-brand-500 flex items-center justify-center bg-editorial-800 text-brand-300 font-serif italic text-4xl shadow-glow">
               A
             </div>
+            <div className="absolute bottom-0 right-0 bg-brand-500 rounded-full p-1 text-white border-2 border-editorial-900">
+              <Check size={12} strokeWidth={3} />
+            </div>
           </div>
-          <h1 className="font-sans font-bold text-3xl tracking-tight text-editorial-50 mb-1">Aarav</h1>
-          <p className="text-editorial-400 text-xs font-mono tracking-[0.15em] uppercase">Member since 2026</p>
+          <h1 className="font-sans font-bold text-2xl tracking-tight text-editorial-50 mb-0.5">Aarav Sharma</h1>
+          <p className="text-editorial-400 text-xs font-mono tracking-wider uppercase mb-1">+91 98765 43210 &bull; Bangalore</p>
+          <span className="text-[9px] font-mono uppercase tracking-widest text-brand-300 bg-brand-950/80 border border-brand-800/60 px-2.5 py-0.5 rounded-full font-bold">
+            Verified Patron
+          </span>
         </motion.div>
 
         <motion.div variants={item} className="px-6 pb-8">
           <div className="bg-editorial-800 border border-editorial-600 rounded-[1rem] overflow-hidden divide-y divide-editorial-700 shadow-bento">
             
-            <button className="w-full flex items-center justify-between p-5 hover:bg-editorial-700 transition-colors">
+            <button 
+              onClick={() => nav && nav('bookings')}
+              aria-label="View Appointments and History"
+              className="w-full flex items-center justify-between p-5 hover:bg-editorial-700 transition-colors text-left focus:outline-none"
+            >
               <div className="flex items-center gap-4 text-editorial-100">
-                <Clock size={18} className="text-editorial-300" />
-                <span className="font-medium text-sm">Past Bookings</span>
+                <Clock size={18} className="text-brand-400" />
+                <div>
+                  <span className="font-bold text-sm block">My Bookings</span>
+                  <span className="text-[10px] text-editorial-400 font-mono">View upcoming & archive</span>
+                </div>
               </div>
               <ChevronRight size={16} className="text-editorial-500" />
             </button>
 
-            <button className="w-full flex items-center justify-between p-5 hover:bg-editorial-700 transition-colors">
+            <button 
+              onClick={() => setActiveModal('payments')}
+              aria-label="View Saved Payment Methods"
+              className="w-full flex items-center justify-between p-5 hover:bg-editorial-700 transition-colors text-left focus:outline-none"
+            >
               <div className="flex items-center gap-4 text-editorial-100">
-                <CreditCard size={18} className="text-editorial-300" />
-                <span className="font-medium text-sm">Payment Methods</span>
+                <CreditCard size={18} className="text-brand-400" />
+                <div>
+                  <span className="font-bold text-sm block">Payment Methods</span>
+                  <span className="text-[10px] text-editorial-400 font-mono">UPI & linked cards</span>
+                </div>
               </div>
               <ChevronRight size={16} className="text-editorial-500" />
             </button>
 
-            <button className="w-full flex items-center justify-between p-5 hover:bg-editorial-700 transition-colors">
+            <button 
+              onClick={() => setActiveModal('settings')}
+              aria-label="Account Settings"
+              className="w-full flex items-center justify-between p-5 hover:bg-editorial-700 transition-colors text-left focus:outline-none"
+            >
               <div className="flex items-center gap-4 text-editorial-100">
-                <Settings size={18} className="text-editorial-300" />
-                <span className="font-medium text-sm">Account Settings</span>
+                <Settings size={18} className="text-brand-400" />
+                <div>
+                  <span className="font-bold text-sm block">Account Preferences</span>
+                  <span className="text-[10px] text-editorial-400 font-mono">Notifications & location</span>
+                </div>
+              </div>
+              <ChevronRight size={16} className="text-editorial-500" />
+            </button>
+
+            <button 
+              onClick={() => setActiveModal('terms')}
+              aria-label="Terms of Service and Privacy Policy"
+              className="w-full flex items-center justify-between p-5 hover:bg-editorial-700 transition-colors text-left focus:outline-none"
+            >
+              <div className="flex items-center gap-4 text-editorial-100">
+                <ShieldCheck size={18} className="text-brand-400" />
+                <div>
+                  <span className="font-bold text-sm block">Legal & Privacy</span>
+                  <span className="text-[10px] text-editorial-400 font-mono">Cancellation & studio terms</span>
+                </div>
               </div>
               <ChevronRight size={16} className="text-editorial-500" />
             </button>
@@ -67,14 +124,99 @@ export default function UserProfileScreen({ back, resetHome }: { back: any, rese
 
           <button 
             onClick={resetHome}
-            className="w-full mt-8 bg-transparent border border-editorial-600 text-editorial-400 hover:text-editorial-200 font-bold py-4 rounded-[1rem] active:scale-[0.98] transition-all flex justify-center items-center gap-2"
+            aria-label="Sign out of account"
+            className="w-full mt-6 bg-transparent border border-editorial-700 hover:border-red-900/80 text-editorial-400 hover:text-red-400 font-bold py-3.5 rounded-[1rem] active:scale-[0.98] transition-all flex justify-center items-center gap-2 focus:outline-none"
           >
             <LogOut size={16} />
-            <span className="text-sm">Sign Out</span>
+            <span className="text-sm">Sign Out of StinOra</span>
           </button>
         </motion.div>
 
       </motion.div>
+
+      {/* POPUP MODAL (Payments / Settings / Legal) */}
+      <AnimatePresence>
+        {activeModal && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-editorial-950/80 backdrop-blur-sm z-50 flex items-end justify-center"
+            role="dialog"
+            aria-modal="true"
+          >
+            <motion.div 
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 26, stiffness: 280 }}
+              className="bg-editorial-900 border-t border-editorial-600 rounded-t-[2rem] w-full p-6 pb-12 shadow-2xl"
+            >
+              <div className="flex justify-between items-center mb-6 pb-3 border-b border-editorial-700">
+                <h3 className="font-serif italic text-xl text-editorial-50">
+                  {activeModal === 'payments' && 'Payment Instruments'}
+                  {activeModal === 'settings' && 'Account Settings'}
+                  {activeModal === 'terms' && 'Studio Policies & Terms'}
+                </h3>
+                <button 
+                  onClick={() => setActiveModal(null)}
+                  className="w-8 h-8 rounded-full border border-editorial-600 flex items-center justify-center text-editorial-400 hover:text-editorial-100"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {activeModal === 'payments' && (
+                <div className="flex flex-col gap-3">
+                  <div className="p-4 bg-editorial-800 border border-editorial-600 rounded-xl flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-editorial-100">Google Pay / PhonePe UPI</p>
+                      <p className="text-[11px] font-mono text-editorial-400">aarav.sharma@okaxis</p>
+                    </div>
+                    <span className="text-[9px] font-mono text-brand-300 font-bold uppercase bg-brand-950 px-2 py-0.5 rounded border border-brand-800/40">Primary</span>
+                  </div>
+                  <div className="p-4 bg-editorial-800 border border-editorial-600 rounded-xl flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-bold text-editorial-100">HDFC Millennia Credit Card</p>
+                      <p className="text-[11px] font-mono text-editorial-400">•••• •••• •••• 4242</p>
+                    </div>
+                    <span className="text-[9px] font-mono text-editorial-400 uppercase">Expires 08/29</span>
+                  </div>
+                </div>
+              )}
+
+              {activeModal === 'settings' && (
+                <div className="flex flex-col gap-4 text-sm">
+                  <div className="flex justify-between py-2 border-b border-editorial-800">
+                    <span className="text-editorial-400 font-mono text-xs">Full Name</span>
+                    <span className="text-editorial-100 font-bold">Aarav Sharma</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-editorial-800">
+                    <span className="text-editorial-400 font-mono text-xs">Mobile Number</span>
+                    <span className="text-editorial-100 font-bold">+91 98765 43210</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-editorial-800">
+                    <span className="text-editorial-400 font-mono text-xs">Primary Studio City</span>
+                    <span className="text-editorial-100 font-bold">Indiranagar, Bangalore</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-editorial-400 font-mono text-xs">SMS Reminders</span>
+                    <span className="text-brand-300 font-mono text-xs font-bold">Enabled</span>
+                  </div>
+                </div>
+              )}
+
+              {activeModal === 'terms' && (
+                <div className="text-xs text-editorial-300 leading-relaxed max-h-[300px] overflow-y-auto no-scrollbar space-y-3">
+                  <p><strong>1. Cancellation & Rescheduling:</strong> Appointments may be cancelled or rescheduled up to 2 hours prior to the booked timeslot with a 100% full refund to the original payment method.</p>
+                  <p><strong>2. Studio Hygiene Standard:</strong> All partner salons in the StinOra network guarantee sterile tools, single-use neck strips, and sanitized styling stations.</p>
+                  <p><strong>3. Late Arrivals:</strong> If you arrive more than 15 minutes past your slot, the studio reserves the right to reallocate chair capacity to walk-ins.</p>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
