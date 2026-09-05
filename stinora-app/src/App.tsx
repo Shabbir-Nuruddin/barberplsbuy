@@ -91,13 +91,76 @@ export function getAvatar(seed: string, initial: string, size: number, colors?: 
   `)}`;
 }
 
+export interface BookingRecord {
+  id: string;
+  salonName: string;
+  barberName: string;
+  barberSpec: string;
+  dateDay: string;
+  dateNum: string;
+  time: string;
+  serviceNames: string;
+  totalPrice: number;
+  status: 'confirmed' | 'cancelled';
+  createdAt: string;
+}
+
 function App() {
   const [screen, setScreen] = useState('welcome');
   const [history, setHistory] = useState(['welcome']);
   const [direction, setDirection] = useState(1);
   const [activeTab, setActiveTab] = useState('home');
 
-  // Global State
+  // Persistent Bookings Engine
+  const [bookings, setBookings] = useState<BookingRecord[]>(() => {
+    try {
+      const saved = localStorage.getItem('stinora_bookings');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error(e);
+    }
+    return [
+      {
+        id: 'STN-8291',
+        salonName: 'Lakme Salon',
+        barberName: 'Rohan Mehra',
+        barberSpec: 'Skin Fade Specialist',
+        dateDay: 'Mon',
+        dateNum: '08 Sept',
+        time: '06:30 PM',
+        serviceNames: 'Skin Fade & Trim, Premium Beard Sculpt',
+        totalPrice: 1050,
+        status: 'confirmed',
+        createdAt: new Date().toISOString()
+      }
+    ];
+  });
+
+  const addBooking = (newBooking: BookingRecord) => {
+    setBookings(prev => {
+      const updated = [newBooking, ...prev];
+      try {
+        localStorage.setItem('stinora_bookings', JSON.stringify(updated));
+      } catch (e) {
+        console.error(e);
+      }
+      return updated;
+    });
+  };
+
+  const cancelBooking = (id: string) => {
+    setBookings(prev => {
+      const updated = prev.map(b => b.id === id ? { ...b, status: 'cancelled' as const } : b);
+      try {
+        localStorage.setItem('stinora_bookings', JSON.stringify(updated));
+      } catch (e) {
+        console.error(e);
+      }
+      return updated;
+    });
+  };
+
+  // Global Booking Wizard State
   const [selectedSalon, setSelectedSalon] = useState<any>(null);
   const [selectedBarber, setSelectedBarber] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<string>(MOCK_DATA.dates[0].id);
@@ -165,7 +228,12 @@ function App() {
 
             {screen === 'home' && (
               <motion.div key="home" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col">
-                <HomeScreen nav={nav} onSelectSalon={setSelectedSalon} setBarber={setSelectedBarber} />
+                <HomeScreen 
+                  nav={nav} 
+                  onSelectSalon={setSelectedSalon} 
+                  setBarber={setSelectedBarber}
+                  setSelectedServices={setSelectedServices}
+                />
               </motion.div>
             )}
 
@@ -177,13 +245,21 @@ function App() {
 
             {screen === 'bookings' && (
               <motion.div key="bookings" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col">
-                <BookingsScreen />
+                <BookingsScreen 
+                  bookings={bookings} 
+                  onCancelBooking={cancelBooking} 
+                  nav={nav} 
+                />
               </motion.div>
             )}
 
             {screen === 'profile' && (
               <motion.div key="profile" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col">
-                <UserProfileScreen back={back} resetHome={() => { setHistory(['welcome']); setScreen('welcome'); }} />
+                <UserProfileScreen 
+                  back={back} 
+                  resetHome={() => { setHistory(['welcome']); setScreen('welcome'); }}
+                  nav={nav}
+                />
               </motion.div>
             )}
 
@@ -213,9 +289,15 @@ function App() {
             {screen === 'billing' && (
               <motion.div key="billing" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col z-30">
                 <BillingScreen 
-                  back={back} resetHome={resetHome} barber={selectedBarber}
+                  back={back} 
+                  resetHome={resetHome} 
+                  nav={nav}
+                  salon={selectedSalon}
+                  barber={selectedBarber}
                   date={MOCK_DATA.dates.find(d => d.id === selectedDate)}
-                  time={selectedTime} services={selectedServices}
+                  time={selectedTime} 
+                  services={selectedServices}
+                  onAddBooking={addBooking}
                 />
               </motion.div>
             )}
@@ -229,6 +311,8 @@ function App() {
             <motion.div 
               initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }} transition={{ type: 'spring', stiffness: 300, damping: 30 }}
               className="bg-editorial-900 border-t border-editorial-600 px-6 py-2 pb-6 md:pb-4 flex justify-between items-center z-10 shrink-0"
+              role="navigation"
+              aria-label="Bottom tab navigation"
             >
               {[
                 { id: 'home', icon: Home, label: 'Home' },
@@ -239,7 +323,13 @@ function App() {
                 const active = activeTab === tab.id;
                 const Icon = tab.icon;
                 return (
-                  <button key={tab.id} onClick={() => nav(tab.id)} className="flex flex-col items-center gap-1.5 p-2 w-16 active:scale-95 transition-transform">
+                  <button 
+                    key={tab.id} 
+                    onClick={() => nav(tab.id)} 
+                    className="flex flex-col items-center gap-1.5 p-2 w-16 active:scale-95 transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 rounded-lg"
+                    aria-label={`Navigate to ${tab.label}`}
+                    aria-selected={active}
+                  >
                     <Icon size={24} className={active ? 'text-brand-400' : 'text-editorial-400'} />
                     <span className={`text-[10px] font-semibold tracking-wide ${active ? 'text-brand-400' : 'text-editorial-500'}`}>{tab.label}</span>
                   </button>
