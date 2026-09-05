@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>StinOra | Salon & Barber Booking</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/@lucide/web"></script>
+  
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- App Container for Mobile Framing on Desktop -->
+  <div class="app-frame">
+    
+    <!-- =======================================================
+         SCREEN 1: HOME
+         ======================================================= -->
+    <main class="screen active" id="view-home">
+      <header class="home-header">
+        <button class="loc-btn">
+          <i data-lucide="map-pin"></i>
+          <span>Indiranagar, Bangalore</span>
+          <i data-lucide="chevron-down" class="small-icon"></i>
+        </button>
+        <button class="profile-btn">
+          <img src="https://ui-avatars.com/api/?name=User&background=D4AF37&color=1E2022" alt="Profile" />
+        </button>
+      </header>
+
+      <section class="search-section">
+        <h1 class="brand-title">StinOra</h1>
+        <div class="search-bar">
+          <i data-lucide="search"></i>
+          <input type="text" placeholder="Search for salons, services, or barbers..." readonly />
+        </div>
+        <div class="search-chips">
+          <span class="chip">Skin Fade</span>
+          <span class="chip">Toni & Guy</span>
+          <span class="chip">Beard Trim</span>
+        </div>
+      </section>
+
+      <section class="carousel-section">
+        <h2 class="section-title">Previous Bookings</h2>
+        <div class="carousel-track" id="recent-bookings-list">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+      
+      <section class="carousel-section mt-4">
+        <h2 class="section-title">Top Rated near you</h2>
+        <div class="carousel-track" id="top-salons-list">
+          <!-- Populated by JS -->
+        </div>
+      </section>
+
+      <nav class="bottom-nav">
+        <button class="nav-item active"><i data-lucide="home"></i><span>Home</span></button>
+        <button class="nav-item"><i data-lucide="compass"></i><span>Explore</span></button>
+        <button class="nav-item"><i data-lucide="calendar"></i><span>Bookings</span></button>
+      </nav>
+    </main>
+
+    <!-- =======================================================
+         SCREEN 2: SALON PROFILE
+         ======================================================= -->
+    <main class="screen" id="view-salon">
+      <div class="salon-hero">
+        <button class="back-btn" onclick="app.goBack()"><i data-lucide="arrow-left"></i></button>
+        <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Salon Interior" class="hero-img" id="salon-hero-img" />
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+          <h1 class="salon-name" id="salon-name">The Crown Salon</h1>
+          <div class="salon-rating">
+            <i data-lucide="star" class="star-icon"></i>
+            <span id="salon-rating">4.8</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="salon-content">
+        <div class="location-row" onclick="alert('Map integration placeholder')">
+          <i data-lucide="map-pin"></i>
+          <span id="salon-address">12th Main Rd, Indiranagar</span>
+          <i data-lucide="chevron-right" class="chevron"></i>
+        </div>
+
+        <section class="about-section">
+          <h2>Our Story</h2>
+          <p id="salon-desc">Luxury grooming for the modern gentleman. We specialize in precision fades, hot towel shaves, and a premium atmosphere.</p>
+        </section>
+
+        <section class="pricing-section">
+          <h2>Average Pricing</h2>
+          <div class="pricing-table">
+            <div class="price-row"><span>Haircut</span><span class="price-val">₹300 - ₹500</span></div>
+            <div class="price-row"><span>Beard Trim</span><span class="price-val">₹150 - ₹250</span></div>
+            <div class="price-row"><span>Hair Color</span><span class="price-val">₹1000+</span></div>
+            <div class="price-row"><span>Scalp Spa</span><span class="price-val">₹800+</span></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="sticky-footer">
+        <button class="btn-primary" onclick="app.goTo('view-barbers')">Book Your Barber</button>
+      </div>
+    </main>
+
+    <!-- =======================================================
+         SCREEN 3: BARBER SELECTION
+         ======================================================= -->
+    <main class="screen" id="view-barbers">
+      <header class="sub-header">
+        <button class="back-btn" onclick="app.goBack()"><i data-lucide="arrow-left"></i></button>
+        <h2>Select Your Barber</h2>
+      </header>
+      
+      <div class="screen-content" id="barber-list">
+        <!-- Populated by JS -->
+      </div>
+    </main>
+
+    <!-- =======================================================
+         SCREEN 4: SCHEDULE & BOOKING
+         ======================================================= -->
+    <main class="screen" id="view-schedule">
+      <header class="sub-header">
+        <button class="back-btn" onclick="app.goBack()"><i data-lucide="arrow-left"></i></button>
+        <h2>Select Time</h2>
+      </header>
+
+      <div class="barber-miniprofile">
+        <img src="" id="sched-barber-img" alt="Barber" />
+        <div class="miniprofile-info">
+          <h3 id="sched-barber-name">Barber Name</h3>
+          <span class="specialty" id="sched-barber-specialty">Specialty</span>
+        </div>
+      </div>
+
+      <div class="screen-content">
+        <!-- Date Selector Strip -->
+        <div class="date-strip" id="date-strip">
+          <!-- Populated by JS -->
+        </div>
+
+        <h3 class="slots-title">Available Slots</h3>
+        
+        <!-- Time Slots Grid -->
+        <div class="slots-grid" id="slots-grid">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="service-selection">
+          <h3>Select Service</h3>
+          <div class="service-options" id="service-options">
+            <label class="svc-check">
+              <input type="checkbox" value="Haircut" data-price="400" checked onchange="app.updateServiceSelection()" />
+              <div class="svc-card">
+                <span class="svc-name">Haircut</span>
+                <span class="svc-price">₹400</span>
+              </div>
+            </label>
+            <label class="svc-check">
+              <input type="checkbox" value="Beard Trim" data-price="200" onchange="app.updateServiceSelection()" />
+              <div class="svc-card">
+                <span class="svc-name">Beard Trim</span>
+                <span class="svc-price">₹200</span>
+              </div>
+            </label>
+            <label class="svc-check">
+              <input type="checkbox" value="Head Massage" data-price="350" onchange="app.updateServiceSelection()" />
+              <div class="svc-card">
+                <span class="svc-name">Head Massage</span>
+                <span class="svc-price">₹350</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="sticky-footer">
+        <button class="btn-primary" id="btn-confirm-slot" onclick="app.goToBilling()" disabled>
+          Confirm Time Slot
+        </button>
+      </div>
+    </main>
+
+    <!-- =======================================================
+         SCREEN 5: BILLING & PAYMENT
+         ======================================================= -->
+    <main class="screen" id="view-billing">
+      <header class="sub-header">
+        <button class="back-btn" onclick="app.goBack()"><i data-lucide="arrow-left"></i></button>
+        <h2>Checkout</h2>
+      </header>
+
+      <div class="screen-content">
+        
+        <!-- Booking Summary Card -->
+        <div class="summary-card">
+          <div class="summ-salon" id="summ-salon">The Crown Salon</div>
+          <div class="summ-row">
+            <span class="summ-lbl">Barber:</span>
+            <span class="summ-val" id="summ-barber">Barber Name</span>
+          </div>
+          <div class="summ-row">
+            <span class="summ-lbl">Time:</span>
+            <span class="summ-val" id="summ-time">Date & Time</span>
+          </div>
+          <div class="summ-row">
+            <span class="summ-lbl">Services:</span>
+            <span class="summ-val" id="summ-services">Haircut</span>
+          </div>
+          <div class="summ-address">
+            <i data-lucide="map-pin"></i>
+            <span id="summ-address">12th Main Rd, Indiranagar</span>
+          </div>
+        </div>
+
+        <!-- Bill Breakdown -->
+        <div class="bill-breakdown">
+          <h3>Bill Details</h3>
+          <div class="bill-row">
+            <span>Service Total</span>
+            <span id="bill-service">₹0</span>
+          </div>
+          <div class="bill-row">
+            <span>Taxes & Fees (5%)</span>
+            <span id="bill-tax">₹0</span>
+          </div>
+          <div class="bill-row bill-total">
+            <span>Total Payable</span>
+            <span class="total-amount" id="bill-total">₹0</span>
+          </div>
+        </div>
+
+        <!-- Payment Method Selector -->
+        <div class="payment-methods">
+          <h3>Pay With</h3>
+          
+          <label class="pay-method">
+            <input type="radio" name="payment" value="upi" checked onchange="app.updatePaymentLabel()" />
+            <div class="pay-body">
+              <div class="pay-icon"><i data-lucide="smartphone"></i></div>
+              <div class="pay-text">UPI (GPay, PhonePe, Paytm)</div>
+            </div>
+          </label>
+          
+          <label class="pay-method">
+            <input type="radio" name="payment" value="card" onchange="app.updatePaymentLabel()" />
+            <div class="pay-body">
+              <div class="pay-icon"><i data-lucide="credit-card"></i></div>
+              <div class="pay-text">Credit / Debit Card</div>
+            </div>
+          </label>
+          
+          <label class="pay-method">
+            <input type="radio" name="payment" value="store" onchange="app.updatePaymentLabel()" />
+            <div class="pay-body">
+              <div class="pay-icon"><i data-lucide="store"></i></div>
+              <div class="pay-text">Pay at Store (Cash / Card)</div>
+            </div>
+          </label>
+        </div>
+
+      </div>
+
+      <div class="sticky-footer">
+        <button class="btn-primary" id="btn-pay" onclick="app.simulatePayment()">
+          Pay & Confirm
+        </button>
+      </div>
+    </main>
+
+    <!-- Success Modal Overlay -->
+    <div class="success-overlay" id="success-overlay">
+      <div class="success-box">
+        <svg class="check-anim" viewBox="0 0 52 52">
+          <circle cx="26" cy="26" r="24" fill="none" />
+          <path fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+        </svg>
+        <h2>Booking Confirmed!</h2>
+        <p>Ticket #<span id="ticket-id">STN829</span></p>
+        <p class="success-msg">Your barber has been notified. See you at <strong id="success-time"></strong>!</p>
+        <button class="btn-secondary mt-4" onclick="app.resetToHome()">Back to Home</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
