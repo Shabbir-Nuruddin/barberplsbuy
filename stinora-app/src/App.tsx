@@ -145,44 +145,44 @@ function App() {
   const showBottomNav = ['home', 'explore', 'bookings', 'profile'].includes(screen);
 
   return (
-    <div className="min-h-[100dvh] w-full bg-dark-950 md:p-8 flex items-center justify-center font-sans">
-      <div className="relative w-full max-w-[440px] h-[100dvh] md:h-[880px] md:max-h-[calc(100vh-4rem)] bg-dark-900 md:rounded-[2.5rem] md:border border-dark-600 shadow-2xl overflow-hidden flex flex-col">
+    <div className="min-h-[100dvh] w-full bg-editorial-950 md:p-8 flex items-center justify-center font-sans">
+      <div className="relative w-full max-w-[440px] h-[100dvh] md:h-[880px] md:max-h-[calc(100vh-4rem)] bg-editorial-900 md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:border border-editorial-600">
         
         <div className="relative flex-1 overflow-hidden">
           <AnimatePresence custom={direction} initial={false} mode="popLayout">
             
             {screen === 'welcome' && (
-              <motion.div key="welcome" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-dark-900 flex flex-col z-50">
+              <motion.div key="welcome" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col z-50">
                 <WelcomeScreen nav={nav} />
               </motion.div>
             )}
 
             {screen === 'home' && (
-              <motion.div key="home" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-dark-900 flex flex-col">
+              <motion.div key="home" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col">
                 <HomeScreen nav={nav} onSelectSalon={setSelectedSalon} />
               </motion.div>
             )}
 
             {screen === 'profile' && (
-              <motion.div key="profile" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-dark-900 flex flex-col">
+              <motion.div key="profile" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col">
                 <UserProfileScreen back={back} resetHome={() => { setHistory(['welcome']); setScreen('welcome'); }} />
               </motion.div>
             )}
 
             {screen === 'salon' && (
-              <motion.div key="salon" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-dark-900 flex flex-col z-20">
+              <motion.div key="salon" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col z-20">
                 <SalonProfileScreen nav={nav} back={back} salon={selectedSalon} />
               </motion.div>
             )}
 
             {screen === 'barbers' && (
-              <motion.div key="barbers" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-dark-900 flex flex-col z-20">
+              <motion.div key="barbers" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col z-20">
                 <BarberSelectionScreen nav={nav} back={back} onSelect={setSelectedBarber} />
               </motion.div>
             )}
 
             {screen === 'schedule' && (
-              <motion.div key="schedule" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-dark-900 flex flex-col z-20">
+              <motion.div key="schedule" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col z-20">
                 <ScheduleScreen 
                   nav={nav} back={back} barber={selectedBarber}
                   selectedDate={selectedDate} setSelectedDate={setSelectedDate}
@@ -193,7 +193,7 @@ function App() {
             )}
 
             {screen === 'billing' && (
-              <motion.div key="billing" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-dark-900 flex flex-col z-30">
+              <motion.div key="billing" custom={direction} variants={variants} initial="initial" animate="animate" exit="exit" className="absolute inset-0 bg-editorial-900 flex flex-col z-30">
                 <BillingScreen 
                   back={back} resetHome={resetHome} barber={selectedBarber}
                   date={MOCK_DATA.dates.find(d => d.id === selectedDate)}
@@ -210,7 +210,7 @@ function App() {
           {showBottomNav && (
             <motion.div 
               initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }} transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="bg-dark-800 border-t border-dark-600 px-6 py-2 pb-6 md:pb-4 flex justify-between items-center z-10 shrink-0"
+              className="bg-editorial-900 border-t border-editorial-600 px-6 py-2 pb-6 md:pb-4 flex justify-between items-center z-10 shrink-0"
             >
               {[
                 { id: 'home', icon: Home, label: 'Home' },
@@ -222,8 +222,8 @@ function App() {
                 const Icon = tab.icon;
                 return (
                   <button key={tab.id} onClick={() => nav(tab.id)} className="flex flex-col items-center gap-1.5 p-2 w-16 active:scale-95 transition-transform">
-                    <Icon size={24} className={active ? 'text-accent-blue' : 'text-dark-400'} />
-                    <span className={`text-[10px] font-semibold tracking-wide ${active ? 'text-accent-blue' : 'text-dark-500'}`}>{tab.label}</span>
+                    <Icon size={24} className={active ? 'text-editorial-50' : 'text-editorial-400'} />
+                    <span className={`text-[10px] font-semibold tracking-wide ${active ? 'text-editorial-50' : 'text-editorial-500'}`}>{tab.label}</span>
                   </button>
                 )
               })}

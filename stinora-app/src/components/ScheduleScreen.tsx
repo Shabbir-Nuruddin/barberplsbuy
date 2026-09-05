@@ -1,5 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
-import { MOCK_DATA, getAvatar } from '../App';
+import { MOCK_DATA } from '../App';
 import { motion } from 'framer-motion';
 
 export default function ScheduleScreen({ 
@@ -31,28 +31,26 @@ export default function ScheduleScreen({
   if (!barber) return null;
 
   return (
-    <div className="flex-1 flex flex-col bg-dark-900 overflow-hidden relative">
+    <div className="flex-1 flex flex-col bg-editorial-900 overflow-hidden relative">
       
-      <header className="px-6 py-5 flex items-center gap-4 bg-dark-900 shrink-0 z-10 border-b border-dark-600/50">
+      <header className="px-6 py-6 flex items-center gap-4 bg-editorial-900 shrink-0 z-10 border-b border-editorial-600/50">
         <button 
           onClick={back}
-          className="w-10 h-10 rounded-full bg-dark-800 shadow-sm border border-dark-600 flex items-center justify-center text-dark-100 active:scale-95 transition-transform"
+          className="w-10 h-10 rounded border border-editorial-600 flex items-center justify-center text-editorial-200 hover:bg-editorial-800 transition-colors"
         >
           <ArrowLeft size={18} />
         </button>
-        <h2 className="font-sans font-bold text-lg tracking-tight text-dark-50">Schedule</h2>
+        <h2 className="font-serif italic text-xl tracking-tight text-editorial-50">Schedule</h2>
       </header>
 
       {/* Mini Profile */}
-      <div className="px-6 py-4 flex items-center gap-4 bg-dark-800 shadow-sm shrink-0 border-b border-dark-600">
-        <img 
-          src={getAvatar(barber.name.toLowerCase().replace(' ', '-'), barber.name[0], 80, ['#6EE7B7', '#3B82F6'])} 
-          alt={barber.name} 
-          className="w-12 h-12 rounded-full border border-dark-600"
-        />
+      <div className="px-6 py-5 flex items-center gap-5 bg-editorial-800 shrink-0 border-b border-editorial-600">
+        <div className="w-12 h-12 rounded border border-editorial-600 flex items-center justify-center bg-editorial-900 text-editorial-200 font-serif italic text-xl">
+          {barber.name[0]}
+        </div>
         <div>
-          <h3 className="font-bold text-sm text-dark-50">{barber.name}</h3>
-          <p className="text-xs font-semibold text-dark-400">{barber.spec}</p>
+          <h3 className="font-bold text-sm text-editorial-50 tracking-tight">{barber.name}</h3>
+          <p className="text-[10px] font-mono tracking-widest uppercase text-editorial-400">{barber.spec}</p>
         </div>
       </div>
 
@@ -60,8 +58,8 @@ export default function ScheduleScreen({
         
         {/* Date Rail */}
         <motion.div variants={item} className="mt-8 mb-8">
-          <div className="px-6 mb-4">
-            <h2 className="font-sans font-bold text-lg text-dark-50">Pick a Date</h2>
+          <div className="px-6 mb-5">
+            <h2 className="font-sans font-bold text-[1.25rem] tracking-tight text-editorial-50">Select Date</h2>
           </div>
           <div className="flex gap-3 overflow-x-auto no-scrollbar px-6 pb-2 -mx-6 snap-x snap-mandatory">
             {MOCK_DATA.dates.map((d) => {
@@ -70,14 +68,14 @@ export default function ScheduleScreen({
                 <button 
                   key={d.id}
                   onClick={() => { setSelectedDate(d.id); setSelectedTime(null); }}
-                  className={`snap-start flex-none w-[76px] h-[86px] rounded-[1.25rem] flex flex-col items-center justify-center gap-1 border transition-all active:scale-[0.98] ${
+                  className={`snap-start flex-none w-[72px] h-[86px] rounded-lg flex flex-col items-center justify-center gap-1 border transition-all active:scale-[0.98] ${
                     active 
-                      ? 'bg-accent-blue border-accent-blue text-dark-950 shadow-diffusion-dark' 
-                      : 'bg-dark-800 border-dark-600 text-dark-300 shadow-sm hover:bg-dark-700'
+                      ? 'bg-editorial-50 border-editorial-50 text-editorial-950 shadow-sm' 
+                      : 'bg-editorial-800 border-editorial-600 text-editorial-300 shadow-bento hover:bg-editorial-700'
                   }`}
                 >
-                  <span className={`font-mono text-[11px] uppercase tracking-widest font-bold ${active ? 'opacity-80' : ''}`}>{d.day}</span>
-                  <span className={`font-sans font-bold text-2xl ${active ? '' : 'text-dark-50'}`}>{d.num}</span>
+                  <span className={`font-mono text-[10px] uppercase tracking-widest font-bold ${active ? 'opacity-80' : ''}`}>{d.day}</span>
+                  <span className={`font-serif italic text-2xl ${active ? '' : 'text-editorial-100'}`}>{d.num}</span>
                 </button>
               )
             })}
@@ -86,8 +84,8 @@ export default function ScheduleScreen({
 
         {/* Time Slots */}
         <motion.div variants={item} className="px-6 mb-10">
-          <div className="mb-4">
-            <h2 className="font-sans font-bold text-lg text-dark-50">Select Time Slot</h2>
+          <div className="mb-5">
+            <h2 className="font-sans font-bold text-[1.25rem] tracking-tight text-editorial-50">Select Time</h2>
           </div>
           <div className="grid grid-cols-3 gap-3">
             {MOCK_DATA.slots.map(t => {
@@ -99,12 +97,12 @@ export default function ScheduleScreen({
                   key={t}
                   disabled={booked}
                   onClick={() => setSelectedTime(t)}
-                  className={`py-3.5 rounded-xl font-mono text-sm font-semibold transition-all shadow-sm ${
+                  className={`py-3.5 rounded-lg font-mono text-[11px] uppercase tracking-widest font-bold transition-all ${
                     booked 
-                      ? 'opacity-30 bg-dark-950 border-dark-600 line-through cursor-not-allowed text-dark-500'
+                      ? 'opacity-30 bg-editorial-950 border border-editorial-600 line-through cursor-not-allowed text-editorial-500'
                       : selected 
-                        ? 'bg-accent-blue border-accent-blue text-dark-950 shadow-diffusion-dark'
-                        : 'bg-dark-800 border border-dark-600 text-dark-100 active:scale-95 hover:border-dark-500 hover:bg-dark-700'
+                        ? 'bg-editorial-50 border border-editorial-50 text-editorial-950 shadow-sm'
+                        : 'bg-editorial-800 border border-editorial-600 text-editorial-200 active:scale-95 shadow-bento hover:bg-editorial-700'
                   }`}
                 >
                   {t}
@@ -116,8 +114,8 @@ export default function ScheduleScreen({
 
         {/* Services */}
         <motion.div variants={item} className="px-6 mb-8">
-          <div className="mb-4">
-            <h2 className="font-sans font-bold text-lg text-dark-50">Select Services</h2>
+          <div className="mb-5">
+            <h2 className="font-sans font-bold text-[1.25rem] tracking-tight text-editorial-50">Select Services</h2>
           </div>
           <div className="flex flex-col gap-3">
             {MOCK_DATA.services.map(srv => {
@@ -126,14 +124,14 @@ export default function ScheduleScreen({
                 <button 
                   key={srv.id}
                   onClick={() => toggleService(srv.id)}
-                  className={`flex justify-between items-center p-5 rounded-2xl border transition-all active:scale-[0.98] ${
+                  className={`flex justify-between items-center p-5 rounded-[1rem] border transition-all active:scale-[0.98] ${
                     selected
-                      ? 'bg-accent-blue border-accent-blue shadow-diffusion-dark'
-                      : 'bg-dark-800 border-dark-600 shadow-sm hover:border-dark-500 hover:bg-dark-700'
+                      ? 'bg-editorial-50 border-editorial-50 shadow-sm'
+                      : 'bg-editorial-800 border-editorial-600 shadow-bento hover:bg-editorial-700'
                   }`}
                 >
-                  <span className={`font-bold text-sm ${selected ? 'text-dark-950' : 'text-dark-50'}`}>{srv.name}</span>
-                  <span className={`font-mono text-sm font-bold ${selected ? 'text-dark-900/80' : 'text-dark-300'}`}>₹{srv.price}</span>
+                  <span className={`font-bold text-sm tracking-tight ${selected ? 'text-editorial-950' : 'text-editorial-50'}`}>{srv.name}</span>
+                  <span className={`font-mono text-[11px] tracking-widest font-bold ${selected ? 'text-editorial-900/80' : 'text-editorial-300'}`}>₹{srv.price}</span>
                 </button>
               )
             })}
@@ -143,18 +141,18 @@ export default function ScheduleScreen({
       </motion.div>
 
       {/* CTA Footer */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-dark-900 via-dark-900/90 to-transparent z-30 pointer-events-none pb-[calc(1.5rem+64px)]">
+      <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-editorial-900 via-editorial-900/95 to-transparent z-30 pointer-events-none pb-[calc(1.5rem+64px)]">
         <button 
           onClick={() => nav('billing')}
           disabled={!isReady}
-          className={`w-full font-bold py-4 rounded-2xl transition-all pointer-events-auto flex items-center justify-center gap-2 ${
+          className={`w-full font-bold py-4 rounded-lg transition-all pointer-events-auto flex items-center justify-center gap-2 ${
             isReady 
-              ? 'bg-accent-blue text-dark-950 active:scale-[0.98] shadow-diffusion-dark' 
-              : 'bg-dark-600 text-dark-400 cursor-not-allowed'
+              ? 'bg-editorial-50 text-editorial-950 active:scale-[0.98] shadow-sm hover:bg-white' 
+              : 'bg-editorial-800 text-editorial-600 cursor-not-allowed border border-editorial-700'
           }`}
         >
           Confirm Details
-          <span className="font-mono text-[9px] font-bold tracking-widest text-dark-900 bg-black/10 px-2 py-0.5 rounded ml-2 uppercase">2/3</span>
+          <span className={`font-mono text-[9px] font-bold tracking-widest px-2 py-0.5 rounded ml-2 uppercase ${isReady ? 'bg-black/10 text-editorial-700' : 'bg-editorial-700 text-editorial-500'}`}>2/3</span>
         </button>
       </div>
 

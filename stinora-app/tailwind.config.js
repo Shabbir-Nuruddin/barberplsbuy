@@ -9,31 +9,27 @@ export default {
       fontFamily: {
         sans: ['Geist', 'sans-serif'],
         mono: ['Geist Mono', 'monospace'],
+        serif: ['Playfair Display', 'serif'],
       },
       colors: {
-        dark: {
-          950: '#0B0A09', // Deepest background
-          900: '#11100E', // Main Background
-          800: '#1A1816', // Cards / Surfaces
-          700: '#23201D', // Hover states
-          600: '#332F2A', // Borders / Dividers
-          500: '#524C44',
-          400: '#7A7266', // Muted Text
-          300: '#A39989',
-          200: '#C2B8A3',
-          100: '#E0D6C1', // Primary Text
-          50: '#F5ECE3',  // Headings
-        },
-        accent: {
-          blue: '#7E93FF', // Blurple CTA
-          green: '#4ADE80', // Success / Availability
-          orange: '#FF8A65', // Gradient element
-          teal: '#2DD4BF', // Gradient element
+        editorial: {
+          950: '#070707',
+          900: '#0C0B0A', // Main Background
+          800: '#141311', // Card Background
+          700: '#1C1A18', 
+          600: '#2A2724', // Thin structural borders
+          500: '#4D4742',
+          400: '#736B63',
+          300: '#998E84',
+          200: '#BFB2A6',
+          100: '#E6D7C8', // Secondary Text
+          50: '#F5EBE1',  // Primary Text
         }
       },
       boxShadow: {
-        'diffusion-dark': '0 20px 40px -15px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
-        'diffusion-sm': '0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
+        // We remove heavy diffusion shadows for the CollectiveOS "Flat Bento" look
+        'bento': 'inset 0 0 0 1px rgba(255, 255, 255, 0.05)',
+        'bento-hover': 'inset 0 0 0 1px rgba(255, 255, 255, 0.15)',
       }
     },
   },
