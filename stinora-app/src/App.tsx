@@ -108,8 +108,8 @@ export interface BookingRecord {
 }
 
 function App() {
-  const [screen, setScreen] = useState('welcome');
-  const [history, setHistory] = useState(['welcome']);
+  const [screen, setScreen] = useState('home');
+  const [history, setHistory] = useState(['home']);
   const [direction, setDirection] = useState(1);
   const [activeTab, setActiveTab] = useState('home');
 
@@ -251,8 +251,8 @@ function App() {
   const showBottomNav = ['home', 'explore', 'bookings', 'profile'].includes(screen);
 
   return (
-    <div className="min-h-[100dvh] w-full bg-editorial-950 md:p-8 flex items-center justify-center font-sans">
-      <div className="relative w-full max-w-[440px] h-[100dvh] md:h-[880px] md:max-h-[calc(100vh-4rem)] bg-editorial-900 md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:border border-editorial-600">
+    <div className="min-h-[100dvh] w-full bg-editorial-950 md:p-6 flex items-center justify-center font-sans overflow-y-auto">
+      <div className="relative w-full max-w-[430px] h-[100dvh] md:h-[840px] md:max-h-[92vh] bg-editorial-900 md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:border border-editorial-600">
         
         <div className="relative flex-1 overflow-hidden">
           <AnimatePresence custom={direction} initial={false} mode="popLayout">
