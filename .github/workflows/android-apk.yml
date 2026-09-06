@@ -1,0 +1,55 @@
+name: Build Android APK
+
+# GitHub's ubuntu runners ship with the Android SDK, so the installable APK can be
+# produced without anyone setting up Android Studio locally.
+on:
+  push:
+    branches: [main, 'claude/**']
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: stinora-app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: stinora-app/package-lock.json
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Sync the web build into the Android project
+        run: npx cap sync android
+
+      - name: Assemble the debug APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+        working-directory: stinora-app/android
+
+      - name: Name the artifact after the commit
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk "out/stinora-${GITHUB_SHA::7}.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: stinora-apk
+          path: stinora-app/out/*.apk
+          retention-days: 90
+          if-no-files-found: error

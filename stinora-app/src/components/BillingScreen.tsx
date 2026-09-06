@@ -1,19 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Smartphone, CreditCard, Store, Loader2, CheckCircle2, Calendar } from 'lucide-react';
-import { MOCK_DATA } from '../App';
+import {
+  SERVICES, priceFor, getService, addBooking, ticketId as newTicket, buildSlots,
+  dateFromKey, getState, type Salon, type Barber,
+} from '../lib/store';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function BillingScreen({ 
-  back, 
-  resetHome, 
-  nav, 
-  salon, 
-  barber, 
-  date, 
-  time, 
-  services, 
-  onAddBooking 
-}: any) {
+export default function BillingScreen({
+  back, resetHome, nav, salon, barber, dateKey, time, services,
+}: {
+  back: () => void; resetHome: () => void; nav: (s: string) => void;
+  salon: Salon; barber: Barber | null; dateKey: string; time: string | null; services: string[];
+}) {
   const [payMethod, setPayMethod] = useState('upi');
   const [processing, setProcessing] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -26,36 +24,58 @@ export default function BillingScreen({
     };
   }, []);
 
-  const sNames = services.map((id: string) => MOCK_DATA.services.find(s => s.id === id)?.name).filter(Boolean).join(', ') || 'Custom Grooming';
-  const subtotal = services.reduce((acc: number, id: string) => {
-    return acc + (MOCK_DATA.services.find(s => s.id === id)?.price || 0);
-  }, 0);
+  const [error, setError] = useState('');
+
+  const chosen = services.map((id) => getService(id)).filter(Boolean) as typeof SERVICES;
+  const sNames = chosen.map((c) => c.name).join(', ') || 'Custom Grooming';
+  // Prices are the stylist's, matching what the schedule screen quoted.
+  const subtotal = chosen.reduce((acc, svc) => acc + priceFor(svc, barber), 0);
   const tax = Math.round(subtotal * 0.05);
   const total = subtotal + tax;
 
+  const dateObj = dateFromKey(dateKey);
+  const dateLabel = dateObj.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short' });
+
   const handlePay = () => {
+    if (!barber || !time) return;
+
+    // Re-check the slot at the moment of payment. Between choosing a time and
+    // paying, the same chair can be taken in another tab or on another visit.
+    const slot = buildSlots(salon.id, barber.id, dateKey).find((s) => s.time === time);
+    if (!slot || slot.status !== 'available') {
+      setError('That chair was taken while you were checking out. Pick another time.');
+      return;
+    }
+
+    setError('');
     setProcessing(true);
     timerRef.current = setTimeout(() => {
-      const generatedTicket = 'STN-' + Math.floor(1000 + Math.random() * 9000);
+      const generatedTicket = newTicket();
+      const customer = getState().customer;
+      addBooking({
+        id: generatedTicket,
+        salonId: salon.id,
+        salonName: salon.name,
+        barberId: barber.id,
+        barberName: barber.name,
+        barberSpec: barber.spec,
+        dateKey,
+        time,
+        serviceIds: chosen.map((c) => c.id),
+        serviceNames: sNames,
+        subtotal,
+        tax,
+        totalPrice: total,
+        paymentMethod: payMethod,
+        status: 'confirmed',
+        createdAt: new Date().toISOString(),
+        customerName: customer.name || 'Guest',
+        customerPhone: customer.phone,
+        isMine: true,
+      });
       setTicketId(generatedTicket);
       setProcessing(false);
       setSuccess(true);
-
-      if (onAddBooking) {
-        onAddBooking({
-          id: generatedTicket,
-          salonName: salon?.name || 'Lakme Salon',
-          barberName: barber?.name || 'Stylist',
-          barberSpec: barber?.spec || 'Specialist',
-          dateDay: date?.day || 'Today',
-          dateNum: date?.num ? `${date.num} Sept` : '08 Sept',
-          time: time || '06:30 PM',
-          serviceNames: sNames,
-          totalPrice: total,
-          status: 'confirmed',
-          createdAt: new Date().toISOString()
-        });
-      }
     }, 1400);
   };
 
@@ -98,7 +118,7 @@ export default function BillingScreen({
             
             <div className="flex justify-between items-start text-sm mb-3">
               <span className="font-mono text-[9px] uppercase tracking-widest text-editorial-400 w-20 pt-0.5 font-bold">Studio</span>
-              <span className="font-bold text-editorial-100 text-right">{salon?.name || 'Lakme Salon'}</span>
+              <span className="font-bold text-editorial-100 text-right">{salon.name}</span>
             </div>
             <div className="flex justify-between items-start text-sm mb-3">
               <span className="font-mono text-[9px] uppercase tracking-widest text-editorial-400 w-20 pt-0.5 font-bold">Stylist</span>
@@ -106,7 +126,7 @@ export default function BillingScreen({
             </div>
             <div className="flex justify-between items-start text-sm mb-3">
               <span className="font-mono text-[9px] uppercase tracking-widest text-editorial-400 w-20 pt-0.5 font-bold">Slot</span>
-              <span className="font-bold text-editorial-100 text-right">{date?.day}, {time}</span>
+              <span className="font-bold text-editorial-100 text-right">{dateLabel}, {time}</span>
             </div>
             <div className="flex justify-between items-start text-sm">
               <span className="font-mono text-[9px] uppercase tracking-widest text-editorial-400 w-20 pt-0.5 font-bold">Services</span>
@@ -173,6 +193,12 @@ export default function BillingScreen({
 
       {/* CTA Footer */}
       <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-editorial-900 via-editorial-900/95 to-transparent z-30 pointer-events-none pb-[calc(1.5rem+64px)]">
+        {error && (
+          <p role="alert" className="pointer-events-auto mb-3 text-[11px] font-bold text-red-500 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2.5">
+            {error}{' '}
+            <button onClick={back} className="underline font-bold">Choose another slot</button>
+          </p>
+        )}
         <button 
           onClick={handlePay}
           disabled={processing || success}
@@ -217,7 +243,7 @@ export default function BillingScreen({
               initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}
               className="text-sm text-editorial-300 font-medium leading-relaxed mb-8 max-w-[280px]"
             >
-              Your stylist has reserved your chair at <strong className="text-editorial-100">{date?.day}, {time}</strong>.
+              Your stylist has reserved your chair at <strong className="text-editorial-100">{dateLabel}, {time}</strong>.
             </motion.p>
 
             <motion.div 
@@ -230,7 +256,7 @@ export default function BillingScreen({
               </div>
               <div className="flex justify-between text-sm mb-3">
                 <span className="font-mono text-[9px] uppercase tracking-widest text-editorial-400 font-bold">Studio</span>
-                <span className="font-bold text-editorial-100 tracking-tight">{salon?.name || 'Lakme Salon'}</span>
+                <span className="font-bold text-editorial-100 tracking-tight">{salon.name}</span>
               </div>
               <div className="flex justify-between text-sm mb-3">
                 <span className="font-mono text-[9px] uppercase tracking-widest text-editorial-400 font-bold">Stylist</span>

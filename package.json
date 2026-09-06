@@ -2,10 +2,10 @@
   "name": "barberplsbuy",
   "version": "2.0.0",
   "private": true,
-  "description": "StinOra — Bespoke Grooming and Salon Studio Appointments",
+  "description": "StinOra \u2014 Bespoke Grooming and Salon Studio Appointments",
   "scripts": {
     "dev": "npm --prefix stinora-app run dev",
-    "build": "npm --prefix stinora-app run build && cp stinora-app/dist/index.html ./index.html && cp -r stinora-app/dist/assets/* ./assets/ && cp stinora-app/dist/vite.svg ./vite.svg && mkdir -p docs && cp -r stinora-app/dist/* docs/ && touch .nojekyll docs/.nojekyll",
+    "build": "npm --prefix stinora-app run build && rm -rf docs assets/index-*.js assets/index-*.css assets/*-normal-*.woff assets/*-normal-*.woff2 && mkdir -p assets docs && cp stinora-app/dist/index.html ./index.html && cp -r stinora-app/dist/assets/* ./assets/ && cp stinora-app/dist/vite.svg ./vite.svg && cp -r stinora-app/dist/* docs/ && touch .nojekyll docs/.nojekyll",
     "preview": "npm --prefix stinora-app run preview"
   },
   "keywords": [

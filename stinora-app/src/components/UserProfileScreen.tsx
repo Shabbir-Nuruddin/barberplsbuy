@@ -1,21 +1,56 @@
-import { useState } from 'react';
-import { ArrowLeft, CreditCard, Clock, Settings, LogOut, ChevronRight, ShieldCheck, X, Check, Sun, Moon, Laptop } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useRef, useState } from 'react';
+import { AREAS, useStore, saveCustomer, pastBookings, resetAll, reseedDemo } from '../lib/store';
+import { readImageResized } from '../lib/photo';
 import type { ThemeMode } from '../App';
+import { ArrowLeft, CreditCard, Clock, LogOut, ChevronRight, ShieldCheck, X, Sun, Moon, Laptop, Camera, LayoutDashboard, RefreshCw } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-export default function UserProfileScreen({ 
-  back, 
-  resetHome, 
+export default function UserProfileScreen({
+  back,
   nav,
   themeMode = 'light',
-  setThemeMode
-}: { 
-  back: any, 
-  resetHome: any, 
-  nav?: any,
-  themeMode?: ThemeMode,
-  setThemeMode?: (m: ThemeMode) => void
+  setThemeMode,
+  onSignOut,
+}: {
+  back: () => void;
+  nav: (s: string) => void;
+  themeMode?: ThemeMode;
+  setThemeMode?: (m: ThemeMode) => void;
+  onSignOut: () => void;
 }) {
+  const store = useStore();
+  const customer = store.customer;
+  const photoInput = useRef<HTMLInputElement>(null);
+  const [edit, setEdit] = useState(false);
+  const [draft, setDraft] = useState({ name: customer.name, phone: customer.phone, area: customer.area || AREAS[0] });
+  const [formError, setFormError] = useState('');
+
+  const spend = pastBookings().reduce((a, b) => a + b.totalPrice, 0);
+  const visits = pastBookings().length;
+  const myReviews = store.reviews.filter((r) => r.authorName === customer.name).length;
+
+  const openPhotoPicker = () => photoInput.current?.click();
+
+  const onPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      saveCustomer({ photo: await readImageResized(file) });
+    } catch (err) {
+      setFormError(err instanceof Error ? err.message : 'That image could not be used.');
+    }
+    e.target.value = '';
+  };
+
+  const saveDetails = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (draft.name.trim().length < 2) return setFormError('Enter the name your stylist should see.');
+    if (draft.phone.replace(/\D/g, '').length < 10) return setFormError('Enter a 10-digit mobile number.');
+    setFormError('');
+    saveCustomer({ name: draft.name.trim(), phone: draft.phone.trim(), area: draft.area, onboarded: true });
+    setEdit(false);
+  };
+
   const [activeModal, setActiveModal] = useState<'payments' | 'settings' | 'terms' | null>(null);
 
   const container: any = {
@@ -48,18 +83,82 @@ export default function UserProfileScreen({
         
         <motion.div variants={item} className="px-6 pt-8 pb-5 text-center flex flex-col items-center">
           <div className="relative mb-4">
-            <div className="w-24 h-24 rounded-full border-2 border-brand-500 flex items-center justify-center bg-editorial-800 text-brand-300 font-serif italic text-4xl shadow-glow">
-              A
-            </div>
-            <div className="absolute bottom-0 right-0 bg-brand-500 rounded-full p-1 text-white border-2 border-editorial-900">
-              <Check size={12} strokeWidth={3} />
-            </div>
+            <button
+              onClick={openPhotoPicker}
+              aria-label="Change your profile picture"
+              className="w-24 h-24 rounded-full border-2 border-brand-500 overflow-hidden flex items-center justify-center bg-editorial-800 text-brand-400 font-serif italic text-4xl shadow-glow active:scale-95 transition-transform"
+            >
+              {customer.photo
+                ? <img src={customer.photo} alt="" className="w-full h-full object-cover" />
+                : (customer.name || 'G').trim()[0].toUpperCase()}
+            </button>
+            <input ref={photoInput} type="file" accept="image/*" onChange={onPhoto} className="hidden" />
+            <span className="absolute bottom-0 right-0 bg-brand-500 rounded-full p-1.5 text-white border-2 border-editorial-900 pointer-events-none">
+              <Camera size={12} strokeWidth={2.5} />
+            </span>
           </div>
-          <h1 className="font-sans font-bold text-2xl tracking-tight text-editorial-50 mb-0.5">Aarav Sharma</h1>
-          <p className="text-editorial-400 text-xs font-mono tracking-wider uppercase mb-1">+91 98765 43210 &bull; Bangalore</p>
-          <span className="text-[9px] font-mono uppercase tracking-widest text-brand-300 bg-brand-950/80 border border-brand-800/60 px-2.5 py-0.5 rounded-full font-bold">
-            Verified Patron
-          </span>
+
+          <h1 className="font-sans font-bold text-2xl tracking-tight text-editorial-50 mb-0.5">{customer.name || 'Guest'}</h1>
+          <p className="text-editorial-400 text-xs font-mono tracking-wider uppercase mb-3">
+            {[customer.phone && `+91 ${customer.phone}`, customer.area].filter(Boolean).join(' · ') || 'No details saved yet'}
+          </p>
+          <button
+            onClick={() => { setDraft({ name: customer.name, phone: customer.phone, area: customer.area || AREAS[0] }); setEdit((v) => !v); }}
+            className="text-[9px] font-mono uppercase tracking-widest text-brand-400 border border-brand-500/40 bg-brand-500/10 px-3 py-1 rounded-full font-bold hover:bg-brand-500/20 transition-colors"
+          >
+            {edit ? 'Close' : 'Edit details'}
+          </button>
+        </motion.div>
+
+        {/* Editable details */}
+        <AnimatePresence>
+          {edit && (
+            <motion.form
+              initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+              onSubmit={saveDetails}
+              className="px-6 mb-6 overflow-hidden"
+            >
+              <div className="bg-editorial-800 border border-editorial-600 rounded-[1rem] p-5 shadow-bento flex flex-col gap-4">
+                <div>
+                  <label htmlFor="pf-name" className="font-mono text-[10px] uppercase tracking-widest font-bold text-editorial-400 block mb-2">Full name</label>
+                  <input id="pf-name" value={draft.name} autoComplete="name" onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                    className="w-full px-4 py-3 bg-editorial-900 border border-editorial-600 rounded-lg outline-none text-editorial-50 text-sm focus:border-brand-400 focus:ring-1 focus:ring-brand-400 transition-colors" />
+                </div>
+                <div>
+                  <label htmlFor="pf-phone" className="font-mono text-[10px] uppercase tracking-widest font-bold text-editorial-400 block mb-2">Mobile number</label>
+                  <input id="pf-phone" type="tel" inputMode="numeric" autoComplete="tel" value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })}
+                    className="w-full px-4 py-3 bg-editorial-900 border border-editorial-600 rounded-lg outline-none text-editorial-50 text-sm focus:border-brand-400 focus:ring-1 focus:ring-brand-400 transition-colors" />
+                </div>
+                <div>
+                  <label htmlFor="pf-area" className="font-mono text-[10px] uppercase tracking-widest font-bold text-editorial-400 block mb-2">Your area</label>
+                  <select id="pf-area" value={draft.area} onChange={(e) => setDraft({ ...draft, area: e.target.value })}
+                    className="w-full px-4 py-3 bg-editorial-900 border border-editorial-600 rounded-lg outline-none text-editorial-50 text-sm focus:border-brand-400">
+                    {AREAS.map((a) => <option key={a} value={a}>{a}</option>)}
+                  </select>
+                </div>
+                {formError && (
+                  <p role="alert" className="text-[11px] font-bold text-red-500 bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2.5">{formError}</p>
+                )}
+                <button type="submit" className="w-full bg-brand-500 text-white shadow-glow font-bold py-3 rounded-lg active:scale-[0.98] transition-all hover:bg-brand-400">
+                  Save details
+                </button>
+              </div>
+            </motion.form>
+          )}
+        </AnimatePresence>
+
+        {/* Lifetime stats, derived from real visits */}
+        <motion.div variants={item} className="px-6 mb-6 grid grid-cols-3 gap-2.5">
+          {[
+            { label: 'Visits', value: String(visits) },
+            { label: 'Spend', value: `₹${spend.toLocaleString('en-IN')}` },
+            { label: 'Reviews', value: String(myReviews) },
+          ].map((st) => (
+            <div key={st.label} className="bg-editorial-800 border border-editorial-600 shadow-bento rounded-[1rem] p-4 text-center">
+              <span className="block font-sans font-bold text-lg text-editorial-50 leading-none mb-1.5">{st.value}</span>
+              <span className="font-mono text-[9px] uppercase tracking-widest text-editorial-400 font-bold">{st.label}</span>
+            </div>
+          ))}
         </motion.div>
 
         {/* APPEARANCE / THEME TOGGLE CARD */}
@@ -151,16 +250,16 @@ export default function UserProfileScreen({
               <ChevronRight size={16} className="text-editorial-500" />
             </button>
 
-            <button 
-              onClick={() => setActiveModal('settings')}
-              aria-label="Account Settings"
+            <button
+              onClick={() => nav('owner')}
+              aria-label="Open Salon OS, the owner dashboard"
               className="w-full flex items-center justify-between p-5 hover:bg-editorial-700 transition-colors text-left focus:outline-none"
             >
               <div className="flex items-center gap-4 text-editorial-100">
-                <Settings size={18} className="text-brand-400" />
+                <LayoutDashboard size={18} className="text-brand-400" />
                 <div>
-                  <span className="font-bold text-sm block">Account Preferences</span>
-                  <span className="text-[10px] text-editorial-400 font-mono">Notifications & location</span>
+                  <span className="font-bold text-sm block">Salon OS</span>
+                  <span className="text-[10px] text-editorial-400 font-mono">Sales, stylists &amp; reviews</span>
                 </div>
               </div>
               <ChevronRight size={16} className="text-editorial-500" />
@@ -183,14 +282,28 @@ export default function UserProfileScreen({
 
           </div>
 
-          <button 
-            onClick={resetHome}
-            aria-label="Sign out of account"
-            className="w-full mt-6 bg-transparent border border-editorial-700 hover:border-red-900/80 text-editorial-400 hover:text-red-400 font-bold py-3.5 rounded-[1rem] active:scale-[0.98] transition-all flex justify-center items-center gap-2 focus:outline-none"
-          >
-            <LogOut size={16} />
-            <span className="text-sm">Sign Out of StinOra</span>
-          </button>
+          <div className="mt-6 flex flex-col gap-3">
+            <button
+              onClick={() => { if (confirm('Reload the demo studio? This replaces the current trading history and reviews.')) reseedDemo(); }}
+              className="w-full bg-transparent border border-editorial-700 hover:border-editorial-500 text-editorial-400 hover:text-editorial-100 font-bold py-3.5 rounded-[1rem] active:scale-[0.98] transition-all flex justify-center items-center gap-2"
+            >
+              <RefreshCw size={15} />
+              <span className="text-sm">Reload demo data</span>
+            </button>
+
+            <button
+              onClick={() => {
+                if (!confirm('Erase your profile, bookings and reviews and start over?')) return;
+                resetAll();
+                onSignOut();
+              }}
+              aria-label="Sign out and erase local data"
+              className="w-full bg-transparent border border-editorial-700 hover:border-red-500/60 text-editorial-400 hover:text-red-500 font-bold py-3.5 rounded-[1rem] active:scale-[0.98] transition-all flex justify-center items-center gap-2 focus:outline-none"
+            >
+              <LogOut size={16} />
+              <span className="text-sm">Sign out &amp; erase data</span>
+            </button>
+          </div>
         </motion.div>
 
       </motion.div>

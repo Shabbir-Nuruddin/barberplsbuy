@@ -1,8 +1,13 @@
 import { ArrowLeft } from 'lucide-react';
-import { MOCK_DATA } from '../App';
+import { barbersOf, barberRating, openSlotCount, dayKey, type Salon } from '../lib/store';
 import { motion } from 'framer-motion';
 
-export default function BarberSelectionScreen({ nav, back, onSelect }: { nav: any, back: any, onSelect: any }) {
+export default function BarberSelectionScreen({ back, salon, onSelect }: {
+  back: () => void; salon: Salon | null; onSelect: (id: string) => void;
+}) {
+  if (!salon) return null;
+  const today = dayKey();
+  const staff = barbersOf(salon.id);
   const container: any = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.08 } }
@@ -25,13 +30,17 @@ export default function BarberSelectionScreen({ nav, back, onSelect }: { nav: an
         </button>
         <div>
           <h2 className="font-serif italic text-xl tracking-tight text-editorial-50">Select Master Stylist</h2>
-          <p className="text-[10px] font-mono tracking-widest uppercase text-editorial-400">Direct chair reservation</p>
+          <p className="text-[10px] font-mono tracking-widest uppercase text-editorial-400 truncate max-w-[220px]">{salon.name}</p>
         </div>
       </header>
 
       <motion.div variants={container} initial="hidden" animate="show" className="flex-1 overflow-y-auto no-scrollbar p-6 flex flex-col gap-4 pb-24">
-        {MOCK_DATA.barbers.map((barber) => {
-          const isAvailable = barber.available;
+        {staff.map((barber) => {
+          // Availability is now a real count of open chairs today, not a fixed flag
+          // that said "Booked Out" forever regardless of the schedule.
+          const free = openSlotCount(salon.id, barber.id, today);
+          const isAvailable = free > 0;
+          const rating = barberRating(barber.id);
           return (
             <motion.button 
               key={barber.id}
@@ -40,8 +49,11 @@ export default function BarberSelectionScreen({ nav, back, onSelect }: { nav: an
               aria-disabled={!isAvailable}
               onClick={() => {
                 if (!isAvailable) return;
-                onSelect(barber); 
-                nav('schedule'); 
+                // onSelect both records the stylist and moves to the schedule.
+                // Setting the stylist and calling nav('schedule') separately could
+                // never work: nav guards on the selected stylist, which is still
+                // null in the same tick that sets it, so the guard always fired.
+                onSelect(barber.id);
               }}
               className={`flex items-center gap-5 p-5 border rounded-[1rem] text-left transition-all ${
                 isAvailable 
@@ -62,7 +74,7 @@ export default function BarberSelectionScreen({ nav, back, onSelect }: { nav: an
                   <h3 className="font-sans font-bold text-base text-editorial-50 mb-0.5 tracking-tight">{barber.name}</h3>
                   {!isAvailable && (
                     <span className="text-[8px] font-mono tracking-wider uppercase font-bold text-red-400 bg-red-950/60 border border-red-800/60 px-1.5 py-0.5 rounded">
-                      Booked Out
+                      Booked out
                     </span>
                   )}
                 </div>
@@ -71,11 +83,11 @@ export default function BarberSelectionScreen({ nav, back, onSelect }: { nav: an
               </div>
 
               <div className="shrink-0 flex flex-col items-end gap-1.5">
-                <span className="font-mono text-xs text-editorial-200 font-bold">{barber.rating} ★</span>
+                <span className="font-mono text-xs text-editorial-200 font-bold">{rating.average.toFixed(1)} ★</span>
                 <span className={`text-[9px] uppercase tracking-wider font-bold px-2 py-0.5 rounded ${
                   isAvailable ? 'text-brand-300 bg-brand-950/50 border border-brand-800/40' : 'text-editorial-500 bg-editorial-800'
                 }`}>
-                  {isAvailable ? 'Available' : 'Fully Booked'}
+                  {isAvailable ? `${free} free` : 'Fully booked'}
                 </span>
               </div>
             </motion.button>

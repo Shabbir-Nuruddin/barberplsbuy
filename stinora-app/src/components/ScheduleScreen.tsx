@@ -1,21 +1,31 @@
 import { ArrowLeft, Sun, Sunset, Moon } from 'lucide-react';
-import { MOCK_DATA } from '../App';
+import {
+  upcomingDays, buildSlots, SERVICES, priceFor, type Salon, type Barber, type Slot,
+} from '../lib/store';
 import { motion } from 'framer-motion';
 
-export default function ScheduleScreen({ 
-  nav, back, barber, 
+export default function ScheduleScreen({
+  nav, back, salon, barber,
   selectedDate, setSelectedDate,
   selectedTime, setSelectedTime,
-  selectedServices, setSelectedServices 
-}: any) {
+  selectedServices, setSelectedServices,
+}: {
+  nav: (s: string) => void; back: () => void; salon: Salon; barber: Barber | null;
+  selectedDate: string; setSelectedDate: (k: string) => void;
+  selectedTime: string | null; setSelectedTime: (t: string | null) => void;
+  selectedServices: string[]; setSelectedServices: (s: string[]) => void;
+}) {
 
   const toggleService = (srvId: string) => {
     if (selectedServices.includes(srvId)) {
-      setSelectedServices(selectedServices.filter((s: string) => s !== srvId));
+      setSelectedServices(selectedServices.filter((s) => s !== srvId));
     } else {
       setSelectedServices([...selectedServices, srvId]);
     }
   };
+
+  const days = upcomingDays(7);
+  if (!barber) return null;
 
   const isReady = selectedTime && selectedServices.length > 0;
 
@@ -28,29 +38,18 @@ export default function ScheduleScreen({
     show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };
 
-  if (!barber) return null;
+  // Availability comes from the salon's trading hours minus the bookings that
+  // exist for this stylist on this date. The old build derived it from a hash of
+  // string lengths, so it showed the same "booked" slots for every stylist on
+  // every day and confirming a booking reserved nothing.
+  const slots = buildSlots(salon.id, barber.id, selectedDate);
+  const timeGroups: Array<{ id: string; label: string; icon: any; slots: Slot[] }> = [
+    { id: 'morning', label: 'Morning', icon: Sun, slots: slots.filter((s) => s.period === 'morning') },
+    { id: 'afternoon', label: 'Afternoon', icon: Sunset, slots: slots.filter((s) => s.period === 'afternoon') },
+    { id: 'evening', label: 'Evening', icon: Moon, slots: slots.filter((s) => s.period === 'evening') },
+  ].filter((g) => g.slots.length > 0);
 
-  // Segment slots for cognitive ease
-  const timeGroups = [
-    {
-      id: 'morning',
-      label: 'Morning',
-      icon: Sun,
-      slots: ['10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM']
-    },
-    {
-      id: 'afternoon',
-      label: 'Afternoon',
-      icon: Sunset,
-      slots: ['12:00 PM', '01:00 PM', '02:00 PM', '02:30 PM', '03:30 PM']
-    },
-    {
-      id: 'evening',
-      label: 'Evening',
-      icon: Moon,
-      slots: ['04:00 PM', '05:30 PM', '06:00 PM']
-    }
-  ];
+  const allGone = slots.every((s) => s.status !== 'available');
 
   return (
     <div className="flex-1 flex flex-col bg-editorial-900 overflow-hidden relative">
@@ -79,7 +78,7 @@ export default function ScheduleScreen({
           <p className="text-[10px] font-mono tracking-widest uppercase text-editorial-400">{barber.spec}</p>
         </div>
         <span className="text-[10px] font-mono font-bold text-editorial-200 bg-editorial-900 px-2.5 py-1 rounded border border-editorial-700">
-          {barber.rating} ★
+          {barber.baseRating} ★
         </span>
       </div>
 
@@ -89,16 +88,16 @@ export default function ScheduleScreen({
         <motion.div variants={item} className="mt-8 mb-8">
           <div className="px-6 mb-4 flex justify-between items-center">
             <h2 className="font-sans font-bold text-[1.15rem] tracking-tight text-editorial-50">Select Date</h2>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-editorial-400 font-semibold">September 2026</span>
+            <span className="font-mono text-[10px] uppercase tracking-wider text-editorial-400 font-semibold">{days[0].monthLabel}</span>
           </div>
           <div className="flex gap-3 overflow-x-auto no-scrollbar px-6 pb-2 -mx-6 snap-x snap-mandatory">
-            {MOCK_DATA.dates.map((d) => {
-              const active = selectedDate === d.id;
+            {days.map((d) => {
+              const active = selectedDate === d.key;
               return (
                 <button 
-                  key={d.id}
-                  onClick={() => { setSelectedDate(d.id); setSelectedTime(null); }}
-                  aria-label={`${d.day}, September ${d.num}`}
+                  key={d.key}
+                  onClick={() => { setSelectedDate(d.key); setSelectedTime(null); }}
+                  aria-label={`${d.day}, ${d.num} ${d.monthLabel}`}
                   aria-selected={active}
                   className={`snap-start flex-none w-[72px] h-[86px] rounded-lg flex flex-col items-center justify-center gap-1 border transition-all active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${
                     active 
@@ -121,8 +120,16 @@ export default function ScheduleScreen({
             <p className="text-xs text-editorial-400">Times in IST (Bangalore)</p>
           </div>
           
+          {allGone && (
+            <div className="mb-4 rounded-[1rem] border border-editorial-700 bg-editorial-800/60 p-5 text-center">
+              <p className="text-xs text-editorial-400">
+                {barber.name.split(' ')[0]} has no chairs left on this day. Try another date.
+              </p>
+            </div>
+          )}
+
           <div className="flex flex-col gap-6">
-            {timeGroups.map(group => {
+            {timeGroups.map((group) => {
               const Icon = group.icon;
               return (
                 <div key={group.id} className="bg-editorial-800/60 border border-editorial-700/80 rounded-[1rem] p-4">
@@ -132,25 +139,24 @@ export default function ScheduleScreen({
                   </div>
                   
                   <div className="grid grid-cols-3 gap-2.5">
-                    {group.slots.map(t => {
-                      const isBooked = (t.length + selectedDate.length + (MOCK_DATA.bookedSlots.indexOf(t) * 3)) % 5 === 0;
-                      const booked = MOCK_DATA.bookedSlots.includes(t) || isBooked; 
-                      const selected = selectedTime === t;
+                    {group.slots.map((slot) => {
+                      const unavailable = slot.status !== 'available';
+                      const selected = selectedTime === slot.time;
                       return (
                         <button
-                          key={t}
-                          disabled={booked}
-                          onClick={() => setSelectedTime(t)}
-                          aria-label={`Time slot ${t} ${booked ? 'booked' : 'available'}`}
+                          key={slot.time}
+                          disabled={unavailable}
+                          onClick={() => setSelectedTime(slot.time)}
+                          aria-label={`${slot.time} ${slot.status === 'booked' ? 'already booked' : slot.status === 'past' ? 'no longer available' : 'available'}`}
                           className={`py-3 rounded-lg font-mono text-[11px] uppercase tracking-widest font-bold transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${
-                            booked 
+                            unavailable
                               ? 'opacity-30 bg-editorial-950 border border-editorial-700/50 line-through cursor-not-allowed text-editorial-600'
-                              : selected 
+                              : selected
                                 ? 'bg-brand-500 border border-brand-500 text-white shadow-glow'
                                 : 'bg-editorial-800 border border-editorial-600 text-editorial-200 active:scale-95 shadow-bento hover:bg-editorial-700'
                           }`}
                         >
-                          {t}
+                          {slot.time}
                         </button>
                       );
                     })}
@@ -168,13 +174,14 @@ export default function ScheduleScreen({
             <span className="text-xs text-editorial-400 font-mono">{selectedServices.length} selected</span>
           </div>
           <div className="flex flex-col gap-3">
-            {MOCK_DATA.services.map(srv => {
+            {SERVICES.map((srv) => {
               const selected = selectedServices.includes(srv.id);
+              const price = priceFor(srv, barber);
               return (
                 <button 
                   key={srv.id}
                   onClick={() => toggleService(srv.id)}
-                  aria-label={`Service ${srv.name} for ₹${srv.price}`}
+                  aria-label={`Service ${srv.name} for ₹${price}`}
                   aria-selected={selected}
                   className={`flex justify-between items-center p-4 rounded-[1rem] border transition-all active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 ${
                     selected
@@ -184,10 +191,10 @@ export default function ScheduleScreen({
                 >
                   <div className="text-left">
                     <span className={`block font-bold text-sm tracking-tight ${selected ? 'text-white' : 'text-editorial-50'}`}>{srv.name}</span>
-                    <span className={`text-[10px] font-mono tracking-wider uppercase ${selected ? 'text-white/80' : 'text-editorial-400'}`}>30-45 mins</span>
+                    <span className={`text-[10px] font-mono tracking-wider uppercase ${selected ? 'text-white/80' : 'text-editorial-400'}`}>{srv.minutes} mins</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className={`font-mono text-xs tracking-widest font-bold ${selected ? 'text-white' : 'text-editorial-200'}`}>₹{srv.price}</span>
+                    <span className={`font-mono text-xs tracking-widest font-bold ${selected ? 'text-white' : 'text-editorial-200'}`}>₹{price}</span>
                     <div className={`w-4 h-4 rounded border flex items-center justify-center ${selected ? 'bg-white border-white' : 'border-editorial-500'}`}>
                       {selected && <div className="w-2 h-2 rounded bg-brand-500"></div>}
                     </div>

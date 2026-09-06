@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
 import { Search, MapPin } from 'lucide-react';
-import { MOCK_DATA } from '../App';
+import { SALONS, salonRating, useStore } from '../lib/store';
 import { useState, useDeferredValue } from 'react';
 
 const CATEGORIES = ['All', 'Skin Fade', 'Luxury', 'Spa', 'Color', 'Classic'];
 
-export default function ExploreScreen({ nav, onSelectSalon }: { nav: any, onSelectSalon: any }) {
+export default function ExploreScreen({ nav, setSalonId }: { nav: (s: string) => void; setSalonId: (id: string) => void }) {
+  const store = useStore();
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All');
   const deferredQuery = useDeferredValue(query);
@@ -19,14 +20,23 @@ export default function ExploreScreen({ nav, onSelectSalon }: { nav: any, onSele
     show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
   };
 
-  const filtered = MOCK_DATA.salons.filter(s => {
+    // Studios in the customer's own area first — the point of asking for it.
+  const home = store.customer.area;
+  const filtered = SALONS.filter(s => {
     const matchesQuery = 
       s.name.toLowerCase().includes(deferredQuery.toLowerCase()) || 
       s.address.toLowerCase().includes(deferredQuery.toLowerCase()) ||
-      s.tags.some(t => t.toLowerCase().includes(deferredQuery.toLowerCase()));
+      s.tags.some((t: string) => t.toLowerCase().includes(deferredQuery.toLowerCase()));
       
     const matchesCat = activeCategory === 'All' || s.tags.includes(activeCategory);
     return matchesQuery && matchesCat;
+  }).sort((a, b) => {
+    if (home) {
+      const an = a.area === home ? 0 : 1;
+      const bn = b.area === home ? 0 : 1;
+      if (an !== bn) return an - bn;
+    }
+    return parseFloat(a.dist) - parseFloat(b.dist);
   });
 
   return (
@@ -81,11 +91,11 @@ export default function ExploreScreen({ nav, onSelectSalon }: { nav: any, onSele
             <p className="text-xs text-editorial-500">Try adjusting your search query or selected category filter.</p>
           </div>
         ) : (
-          filtered.map(salon => (
+          filtered.map((salon) => (
             <motion.button 
               key={salon.id}
               variants={item}
-              onClick={() => { onSelectSalon(salon); nav('salon'); }}
+              onClick={() => { setSalonId(salon.id); nav('salon'); }}
               aria-label={`View studio ${salon.name} in Indiranagar`}
               className="flex gap-4 p-4 bg-editorial-800 border border-editorial-600 shadow-bento rounded-[1rem] text-left hover:bg-editorial-700 hover:border-editorial-500 transition-all active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
             >
@@ -104,11 +114,11 @@ export default function ExploreScreen({ nav, onSelectSalon }: { nav: any, onSele
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs text-brand-300 font-bold">{salon.rating} ★</span>
+                  <span className="font-mono text-xs text-brand-300 font-bold">{salonRating(salon.id).average.toFixed(1)} ★</span>
                   <span className="text-editorial-600 text-xs">&bull;</span>
                   <span className="text-[9px] uppercase tracking-wider font-bold text-editorial-300">{salon.dist}</span>
                   <div className="ml-auto flex gap-1">
-                    {salon.tags.slice(0, 1).map(t => (
+                    {salon.tags.slice(0, 1).map((t: string) => (
                       <span key={t} className="text-[8px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-editorial-900 text-editorial-400 border border-editorial-700">
                         {t}
                       </span>
